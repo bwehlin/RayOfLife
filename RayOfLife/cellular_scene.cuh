@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "scene_object.cuh"
+#include "scene_object.h"
 
 #include <cstdlib>
 

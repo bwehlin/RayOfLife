@@ -1,4 +1,5 @@
-﻿#include "cellular_scene.cuh"
+﻿
+#include "cellular_scene.cuh"
 #include <stdexcept>
 
 rol::CellularScene::CellularScene(size_t i, size_t j, size_t k)
