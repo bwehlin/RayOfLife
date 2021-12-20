@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="cpu_renderer.cpp">
+      <Filter>Renderer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="cpu_renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="renderer.h">
+      <Filter>Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_object.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="scene_object_functions.cuh">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="cellular_scene.cuh">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="vector_math.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="intersect.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Renderer">
+      <UniqueIdentifier>{fa421d3c-27c5-49f4-ab2f-35987780560e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{8ca62080-be1d-419d-a16a-38b5edd96e9e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{e6d63ea1-9661-493c-8209-620bdd5cfa14}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="cellular_scene.cu">
+      <Filter>Scene</Filter>
+    </CudaCompile>
+    <CudaCompile Include="intersect.cu">
+      <Filter>Math</Filter>
+    </CudaCompile>
+  </ItemGroup>
+</Project>

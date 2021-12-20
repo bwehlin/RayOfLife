@@ -22,15 +22,19 @@ namespace rol
     //void transferToHost();
 
     // Evolve the scene according to the Game of Life rules.
-    //void evolve();
+    void evolveCpu();
 
   private:
 
-    // Each cell block (sorry for the rather ominous terminology!)
-    // consists of 8 slots along the x axis. As such, we will
-    // allocate (i/8 * j * k) blocks.
+    size_t m_strideI;
+    size_t m_strideJ;
 
-    char* m_h_cellBlocks = nullptr;
+    // Each cell block (sorry for the rather ominous terminology!)
+    // consists of 8 slots along the z axis. As such, we will
+    // allocate (i * j * k/8) blocks.
+
+    //char* m_h_cellBlocks = nullptr;
+    std::vector<char> m_h_cellBlocks;
     char* m_d_cellBlocks = nullptr;
   };
 

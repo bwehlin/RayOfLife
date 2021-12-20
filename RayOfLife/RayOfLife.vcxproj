@@ -86,14 +86,22 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cpu_renderer.cpp" />
+    <ClCompile Include="renderer.cpp" />
     <CudaCompile Include="cellular_scene.cu" />
     <ClCompile Include="main.cpp">
       <FileType>Document</FileType>
     </ClCompile>
+    <CudaCompile Include="intersect.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cellular_scene.cuh" />
+    <ClInclude Include="cpu_renderer.h" />
+    <ClInclude Include="intersect.cuh" />
+    <ClInclude Include="renderer.h" />
     <ClInclude Include="scene_object.h" />
+    <ClInclude Include="scene_object_functions.cuh" />
+    <ClInclude Include="vector_math.cuh" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

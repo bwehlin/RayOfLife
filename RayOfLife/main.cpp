@@ -28,7 +28,6 @@ SOFTWARE.
 #include <fstream>
 #include <numeric>
 #include <algorithm>
-#include <png.h>
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -48,8 +47,9 @@ SOFTWARE.
 #include <boost/math/constants/constants.hpp>
 
 #include "scene_object.h"
-
-
+#include "cellular_scene.cuh"
+#include "intersect.cuh"
+#include "vector_math.cuh"
 
 struct Scene
 {
@@ -124,120 +124,9 @@ Scene makeScene()
   return scene;
 }
 
-float norm(float3 in)
-{
-  return sqrtf(in.x * in.x + in.y * in.y + in.z * in.z);
-}
 
-float3 normalize(float3 in)
-{
-  auto normVal = norm(in);
-  in.x /= normVal;
-  in.y /= normVal;
-  in.z /= normVal;
-  return in;
-}
 
-float dot(float3 a, float3 b)
-{
-  return a.x * b.x + a.y * b.y + a.z * b.z;
-}
 
-float3 operator+(float3 a, float3 b)
-{
-  a.x += b.x;
-  a.y += b.y;
-  a.z += b.z;
-  return a;
-}
-
-float3& operator+=(float3& a, float3 b)
-{
-  a.x += b.x;
-  a.y += b.y;
-  a.z += b.z;
-  return a;
-}
-
-float3 operator-(float3 a, float3 b)
-{
-  a.x -= b.x;
-  a.y -= b.y;
-  a.z -= b.z;
-  return a;
-}
-
-float3 operator*(float c, float3 v)
-{
-  v.x *= c;
-  v.y *= c;
-  v.z *= c;
-  return v;
-}
-
-float3 operator*(float3 v, float c)
-{
-  v.x *= c;
-  v.y *= c;
-  v.z *= c;
-  return v;
-}
-
-float intersectSphere(float3 rayOrigin, float3 rayDirection, const rol::SphereData& sphere)
-{
-  auto sphereCenter = sphere.position;
-  auto sphereRadius = sphere.radius;
-  
-  auto a = dot(rayDirection, rayDirection);
-  auto os = rayOrigin - sphereCenter;
-  auto b = 2.f * dot(rayDirection, os);
-  auto c = dot(os, os) - sphereRadius * sphereRadius;
-  auto disc = b * b - 4 * a * c;
-  if (disc > 0.f)
-  {
-    auto distSqrt = sqrtf(disc);
-    auto q = b < 0. ? (-b - distSqrt) / 2.f : (-b + distSqrt) / 2.f;
-    auto t0 = q / a;
-    auto t1 = c / q;
-    if (t0 > t1)
-    {
-      std::swap(t0, t1);
-    }
-    if (t1 >= 0.)
-    {
-      return (t0 < 0.) ? t1 : t0;
-    }
-  }
-  return std::numeric_limits<float>::infinity();
-}
-
-float intersectPlane(float3 rayOrigin, float3 rayDirection, const rol::PlaneData& plane)
-{
-  auto denom = dot(rayDirection, plane.normal);
-  if (fabsf(denom) < 1e-6f)
-  {
-    return std::numeric_limits<float>::infinity();
-  }
-  auto d = dot(plane.position - rayOrigin, plane.normal) / denom;
-  if (d < 0.f)
-  {
-    return std::numeric_limits<float>::infinity();
-  }
-  return d;
-#if 0
-  def intersect_plane(O, D, P, N) :
-  # Return the distance from O to the intersection of the ray(O, D) with the
-    # plane(P, N), or +inf if there is no intersection.
-    # Oand P are 3D points, Dand N(normal) are normalized vectors.
-    denom = np.dot(D, N)
-    if np.abs(denom) < 1e-6:
-  return np.inf
-    d = np.dot(P - O, N) / denom
-    if d < 0 :
-      return np.inf
-      return d
-#endif
-}
 
 std::vector<float> linspace(float from, float to, std::size_t n)
 {
@@ -321,8 +210,8 @@ float3 getColor(const rol::PlaneData& plane, float3 pos)
   auto w = plane.texture->w;
   auto h = plane.texture->pixels.size() / w;
 
-  int ix = static_cast<int>(x * static_cast<float>(w) * 1000.f) % w;
-  int iy = static_cast<int>(y * static_cast<float>(h) * 1000.f) % h;
+  unsigned long ix = static_cast<int>(x * static_cast<float>(w) * 1000.f) % w;
+  unsigned long iy = static_cast<int>(y * static_cast<float>(h) * 1000.f) % h;
   
   if (ix < 0)
   {
@@ -467,8 +356,11 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
       color.x = std::clamp(color.x, 0.f, 1.f) *255.f;
       color.y = std::clamp(color.y, 0.f, 1.f) *255.f;
       color.z = std::clamp(color.z, 0.f, 1.f) *255.f;
-
-      dstImageView(ix, dstImage.height() - 1 - iy) = boost::gil::rgb8_pixel_t(color.x, color.y, color.z);
+      
+      dstImageView(ix, dstImage.height() - 1 - iy) = boost::gil::rgb8_pixel_t(
+        static_cast<unsigned char>(color.x), 
+        static_cast<unsigned char>(color.y),
+        static_cast<unsigned char>(color.z));
     }
   }
 }
@@ -504,6 +396,10 @@ int main(int, char**)
   render(image, makeScene());
 
   boost::gil::write_view("test.bmp", view, boost::gil::bmp_tag());
+
+  rol::CellularScene cs(16, 16, 16);
+
+
 
   return EXIT_SUCCESS;
 }
