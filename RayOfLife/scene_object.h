@@ -57,7 +57,7 @@ namespace rol
     return ret;
   }
 
-  inline SceneObject makePlane(float3 pos, float3 normal, const Texture* texture)
+  inline SceneObject makePlane(float3 pos, float3 normal)
   {
     SceneObject ret;
     ret.type = SceneObjectType::Plane;
@@ -66,7 +66,6 @@ namespace rol
     ret.specularC = .5f;
     ret.data.plane.position = pos;
     ret.data.plane.normal = normal;
-    ret.data.plane.texture = texture;
     return ret;
   }
 }

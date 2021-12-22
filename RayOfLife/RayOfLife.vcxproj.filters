@@ -22,7 +22,7 @@
     <ClInclude Include="scene_object_functions.cuh">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="cellular_scene.cuh">
+    <ClInclude Include="game.cuh">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="vector_math.cuh">
@@ -47,7 +47,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <CudaCompile Include="cellular_scene.cu">
+    <CudaCompile Include="game.cu">
       <Filter>Scene</Filter>
     </CudaCompile>
     <CudaCompile Include="intersect.cu">

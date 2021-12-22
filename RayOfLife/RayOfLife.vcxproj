@@ -88,14 +88,14 @@
   <ItemGroup>
     <ClCompile Include="cpu_renderer.cpp" />
     <ClCompile Include="renderer.cpp" />
-    <CudaCompile Include="cellular_scene.cu" />
+    <CudaCompile Include="game.cu" />
     <ClCompile Include="main.cpp">
       <FileType>Document</FileType>
     </ClCompile>
     <CudaCompile Include="intersect.cu" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cellular_scene.cuh" />
+    <ClInclude Include="game.cuh" />
     <ClInclude Include="cpu_renderer.h" />
     <ClInclude Include="intersect.cuh" />
     <ClInclude Include="renderer.h" />
