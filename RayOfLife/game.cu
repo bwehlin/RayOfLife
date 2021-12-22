@@ -9,22 +9,17 @@ size_t getCellIndex(size_t i, size_t j, size_t k, size_t strideI, size_t strideJ
   return i * strideI + j * strideJ + k / 8;
 }
 
-rol::Game::Game(
-  uint16_t blockSzX, uint16_t blockSzY, uint16_t blockSzZ,
-  size_t i, size_t j, size_t k, 
-  rol::TransitionRule rule)
+rol::Game::Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz = 16u)
 {
-  if (i % 2 != 0 || j % 2 != 0 || k % 2 != 0)
+  if (nCellsPerDimension % 2 != 0)
   {
-    throw std::runtime_error("'i', 'j' and 'k' must be multiples of 2");
+    throw std::runtime_error("'nCellsPerDimension' must be a multiple of 2");
   }
 
-  if (i % blockSzX != 0 || j % blockSzY != 0 || k % blockSzZ != 0)
+  if (nCellsPerDimension % blockSz != 0)
   {
-    throw std::runtime_error("'i', 'j' and 'k' must be multiples of their corresponding blockSz");
+    throw std::runtime_error("'nCellsPerDimension' must be a multiple of blockSz");
   }
-
-  
 }
 
 rol::Game::~Game()

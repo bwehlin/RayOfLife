@@ -65,8 +65,8 @@ namespace rol
 
   struct CellGrid3d
   {
-    uint16_t blockDims[3]; // Dimension of each CellBlock
-    uint16_t blockCounts[3]; // Number of CellBlocks total
+    size_t blockDim;   // Side length of each CellBlock
+    size_t blockCount; // Number of CellBlocks along each axis
 
     CellBlock* blocks;
   };
@@ -82,39 +82,32 @@ namespace rol
     uint8_t fl, fu;
   };
 
+  inline TransitionRule makeTransitionRule(uint8_t el, uint8_t eu, uint8_t fl, uint8_t fu)
+  {
+    TransitionRule rule;
+    rule.el = el;
+    rule.eu = eu;
+    rule.fl = fl;
+    rule.fu = fu;
+    return rule;
+  }
+
   // A Game consists of an (i,j,k) grid of positions that can be either
   // occupied by a sphere or empty. That is, a 3D bitmap.
   class Game
   {
   public:
-    Game(
-      uint16_t blockSzX, uint16_t blockSzY, uint16_t blockSzZ,
-      size_t i, size_t j, size_t k,
-      TransitionRule rule);
-    virtual ~Game();
+    Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz = 16u);
+    virtual ~Game() = default;
 
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
 
   private:
-    virtual void initRandomPrimordialSoup();
+    virtual void initRandomPrimordialSoup(int seed = 2360) = 0;
   };
 
-  class CpuGame
-  {
-  public:
-    CpuGame(
-      uint16_t blockSzX, uint16_t blockSzY, uint16_t blockSzZ,
-      size_t i, size_t j, size_t k,
-      TransitionRule rule);
-    virtual ~CpuGame();
-
-    CpuGame(const CpuGame&) = delete;
-    CpuGame& operator=(const CpuGame&) = delete;
-
-  private:
-    CellGrid3d m_grid;
-  };
+  
 
   //__host__ __device__ 
 }

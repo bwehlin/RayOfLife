@@ -86,6 +86,7 @@
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cpu_game.cpp" />
     <ClCompile Include="cpu_renderer.cpp" />
     <ClCompile Include="renderer.cpp" />
     <CudaCompile Include="game.cu" />
@@ -95,6 +96,7 @@
     <CudaCompile Include="intersect.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="cpu_game.h" />
     <ClInclude Include="game.cuh" />
     <ClInclude Include="cpu_renderer.h" />
     <ClInclude Include="intersect.cuh" />

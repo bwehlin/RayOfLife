@@ -8,6 +8,9 @@
     <ClCompile Include="cpu_renderer.cpp">
       <Filter>Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="cpu_game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cpu_renderer.h">
@@ -17,19 +20,22 @@
       <Filter>Renderer</Filter>
     </ClInclude>
     <ClInclude Include="scene_object.h">
-      <Filter>Scene</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="scene_object_functions.cuh">
-      <Filter>Scene</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="game.cuh">
-      <Filter>Scene</Filter>
+      <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="vector_math.cuh">
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="intersect.cuh">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="cpu_game.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -39,16 +45,16 @@
     <Filter Include="Renderer">
       <UniqueIdentifier>{fa421d3c-27c5-49f4-ab2f-35987780560e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{8ca62080-be1d-419d-a16a-38b5edd96e9e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Math">
       <UniqueIdentifier>{e6d63ea1-9661-493c-8209-620bdd5cfa14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{8ca62080-be1d-419d-a16a-38b5edd96e9e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="game.cu">
-      <Filter>Scene</Filter>
+      <Filter>Game</Filter>
     </CudaCompile>
     <CudaCompile Include="intersect.cu">
       <Filter>Math</Filter>
