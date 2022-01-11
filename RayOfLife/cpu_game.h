@@ -13,10 +13,11 @@ namespace rol
     CpuGame(const CpuGame&) = delete;
     CpuGame& operator=(const CpuGame&) = delete;
 
-  private:
-    void initGrid();
     void initRandomPrimordialSoup(int seed = 2360) override;
 
+  private:
+    void initGrid();
+    
     CellGrid3d m_grid;
 
     size_t m_nCellsPerDimension;

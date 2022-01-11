@@ -47,10 +47,10 @@ SOFTWARE.
 #include <boost/math/constants/constants.hpp>
 
 #include "scene_object.h"
-#include "cellular_scene.cuh"
 #include "intersect.cuh"
 #include "vector_math.cuh"
 
+#if 0
 struct Scene
 {
   std::vector<rol::SceneObject> objects;
@@ -236,6 +236,8 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
   }
 }
 
+#endif
+
 #if 0
 >> > def trace_ray(O, D) :
   # Find first point of intersection with the scene.
@@ -259,18 +261,16 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
     return col
 #endif
 
+
+#include "cpu_game.h"
+#include "cpu_renderer.h"
+
 int main(int, char**)
 {
-  boost::gil::rgb8_image_t image(1024, 768);
-  auto const & view = boost::gil::view(image);
-  
-  render(image, makeScene());
+  rol::CpuGame game(rol::make5766rule(), 16);
+  rol::CpuRenderer renderer(640, 480);
 
-  boost::gil::write_view("test.bmp", view, boost::gil::bmp_tag());
-
-  rol::CellularScene cs(16, 16, 16);
-
-
+  game.initRandomPrimordialSoup(2360);
 
   return EXIT_SUCCESS;
 }

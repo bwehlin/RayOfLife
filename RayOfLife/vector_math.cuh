@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include <cuda_runtime.h>
+
 __host__ __device__ inline
 float norm(float3 in)
 {
@@ -65,4 +67,15 @@ float3 operator*(float3 v, float c)
   v.y *= c;
   v.z *= c;
   return v;
+}
+
+__host__ __device__ inline
+void linspace(float* out, float from, float to, std::size_t n)
+{
+  auto step = (to - from) / static_cast<float>(n);
+  for (std::size_t i = 0; i + 1 < n; ++i)
+  {
+    out[i] = from + static_cast<float>(i) * step;
+  }
+  out[n - 1] = to; // Don't rely on FP arithmetic to reach 'to'
 }

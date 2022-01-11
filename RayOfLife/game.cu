@@ -9,7 +9,7 @@ size_t getCellIndex(size_t i, size_t j, size_t k, size_t strideI, size_t strideJ
   return i * strideI + j * strideJ + k / 8;
 }
 
-rol::Game::Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz = 16u)
+rol::Game::Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz)
 {
   if (nCellsPerDimension % 2 != 0)
   {
@@ -22,12 +22,3 @@ rol::Game::Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz =
   }
 }
 
-rol::Game::~Game()
-{
-#if 0
-  if (m_h_cellBlocks)
-  {
-    cudaFreeHost(m_h_cellBlocks);
-  }
-#endif
-}

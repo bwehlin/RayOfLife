@@ -50,11 +50,12 @@ rol::CpuGame::initRandomPrimordialSoup(int seed)
 
   std::random_device rd;
   std::mt19937 gen(seed);
+  std::uniform_int_distribution<short> dist(0, 255);
   for (size_t i = 0ul; i < nBlocksTotal; ++i)
   {
     for (size_t j = 0ul; j < nOctetsPerBlock; ++j)
     {
-      //m_grid.blocks[i].octets[j]
+      m_grid.blocks[i].octets[j] = static_cast<std::uint8_t>(dist(gen));
     }
   }
 }

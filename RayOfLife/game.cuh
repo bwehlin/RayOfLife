@@ -92,6 +92,18 @@ namespace rol
     return rule;
   }
 
+  // 5766 is one of the rules identified by Bayes
+  inline TransitionRule make5766rule()
+  {
+    return makeTransitionRule(5, 7, 6, 6);
+  }
+
+  // 4555 is one of the rules identified by Bayes
+  inline TransitionRule make4555rule()
+  {
+    return makeTransitionRule(4, 5, 5, 5);
+  }
+
   // A Game consists of an (i,j,k) grid of positions that can be either
   // occupied by a sphere or empty. That is, a 3D bitmap.
   class Game
@@ -103,7 +115,6 @@ namespace rol
     Game(const Game&) = delete;
     Game& operator=(const Game&) = delete;
 
-  private:
     virtual void initRandomPrimordialSoup(int seed = 2360) = 0;
   };
 

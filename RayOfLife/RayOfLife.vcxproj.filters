@@ -37,9 +37,13 @@
     <ClInclude Include="cpu_game.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="camera.cuh">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Renderer">
