@@ -24,17 +24,43 @@ namespace rol
 
     fptype maxBoundaryCoord = static_cast<fptype>(nCellsPerDim) + 1.f;
 
-    state.pos = make_int3(0, 0, 0); // TODO
+    state.pos = make_int3(0, 0, 0);
 
-    if (origin.x >= 0.f && origin.x < maxBoundaryCoord
-      && origin.y >= 0.f && origin.y < maxBoundaryCoord
-      && origin.z >= 0.f && origin.z < maxBoundaryCoord)
+    // Assume we are always viewing the cube from  (-inf, 0) x [0, nCellsPerDim] x [0, nCellsPerDim].
+    // This way we can only hit the side of the cube that lies along the yz plane. If we don't hit
+    // this plane with the ray, we don't hit the cube at all.
+
+    if (origin.x >= 0.f && origin.x < maxBoundaryCoord)
     {
-      // Ray starts inside cell cube
+      // Ray starts inside cell cube. We don't bother checking for y and z because
+      // if x is inside the cube, then we have entered the cube earlier and it means
+      // we're bouncing around inside the cube already.
 
       state.pos.x = static_cast<int>(origin.x); // Assuming unit length for the cells
       state.pos.y = static_cast<int>(origin.y);
       state.pos.z = static_cast<int>(origin.z);
+    }
+    else
+    {
+      // x0 + tv = 0 => t = -x0/v
+
+      auto t = -origin.x / direction.x;
+      
+      auto y = origin.y + t * direction.y;
+      auto z = origin.z + t * direction.z;
+
+      if (y >= 0.f && y < maxBoundaryCoord
+        && z >= 0.f && z < maxBoundaryCoord)
+      {
+        state.pos.x = 0;
+        state.pos.y = static_cast<int>(y);
+        state.pos.z = static_cast<int>(z);
+      }
+      else
+      {
+        state.pos.x = cuda::std::numeric_limits<int>::max();
+        return state;
+      }
     }
 
     state.step.x = direction.x < 0 ? -1

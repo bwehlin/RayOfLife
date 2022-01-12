@@ -56,3 +56,23 @@ TEST(AmantidesWoo, StartInsideCube)
   EXPECT_EQ(lastState.pos.y, 10);
   EXPECT_EQ(lastState.pos.z, 15);
 }
+
+TEST(AmantidesWoo, StartOutsideCube)
+{
+  auto state = rol::initAmantidesWoo(makeFp3(-4.6f, -1.3f, -3.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
+
+  EXPECT_EQ(state.pos.x, 0);
+  EXPECT_EQ(state.pos.y, 6);
+  EXPECT_EQ(state.pos.z, 7);
+
+  auto lastState = state;
+  while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
+  {
+    lastState = state;
+    rol::nextAwStep(state);
+  }
+
+  EXPECT_EQ(lastState.pos.x, 3);
+  EXPECT_EQ(lastState.pos.y, 12);
+  EXPECT_EQ(lastState.pos.z, 15);
+}
