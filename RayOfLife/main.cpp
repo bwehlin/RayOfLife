@@ -270,7 +270,7 @@ int main(int, char**)
 {
   rol::CpuGame game(rol::make5766rule(), 16);
 
-  auto camera = rol::makeCamera(makeFp3(-3.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f));
+  auto camera = rol::makeCamera(makeFp3(-2.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f));
 
   rol::CpuRenderer renderer(1024, 768);
   game.initRandomPrimordialSoup(2360);

@@ -16,7 +16,7 @@ namespace rol
 
     // Sphere geometry
 
-    fptype sphereRaidus = .4f;
+    fptype sphereRaidus = .1f;
 
     // Lighting
 

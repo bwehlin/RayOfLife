@@ -87,6 +87,9 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
     rayOrigin = intersection.point + intersection.normal * static_cast<fptype>(0.0001f);
     rayDirection = normalize(rayDirection - 2 * dot(rayDirection, intersection.normal) * intersection.normal);
 
+    awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
+    rol::nextAwStep(awstate);
+
     color += reflection * intersection.color;
     reflection *= m_scene.sphereReflection;
   }
