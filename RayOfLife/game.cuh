@@ -28,13 +28,13 @@ namespace rol
   // other than 0 or 1.
   
   // To address [ zk yj xi ], we use a bit mask
-  __host__ __device__ inline
+  __host__ __device__ __inline__
   uint8_t getOctetMask(uint8_t x, uint8_t y, uint8_t z)
   {
     return ((1 << (z * 4)) << (y * 2)) << x;
   }
   
-  __host__ __device__ inline
+  __host__ __device__ __inline__
   void setOctetValue(uint8_t& octet, uint8_t x, uint8_t y, uint8_t z, bool value)
   {
     auto mask = getOctetMask(x, y, z);
@@ -48,7 +48,7 @@ namespace rol
     }
   }
 
-  __host__ __device__ inline
+  __host__ __device__ __inline__
   bool getOctetValue(uint8_t octet, uint8_t x, uint8_t y, uint8_t z)
   {
     // Optimization note: explicitly not using a reference here since the reference itself
@@ -70,6 +70,36 @@ namespace rol
 
     CellBlock* blocks;
   };
+
+  __host__ __device__ __inline__
+  bool isAlive(const CellGrid3d& grid, int x, int y, int z)
+  {
+    auto blockX = x / grid.blockDim;
+    auto blockY = y / grid.blockDim;
+    auto blockZ = z / grid.blockDim;
+
+    auto blockIdx = blockZ * grid.blockCount * grid.blockCount + blockY * grid.blockCount + blockX;
+
+    auto const & block = grid.blocks[blockIdx];
+
+    auto offsetX = x - blockX * grid.blockDim;
+    auto offsetY = y - blockY * grid.blockDim;
+    auto offsetZ = z - blockZ * grid.blockDim;
+
+    auto octetX = offsetX / 2;
+    auto octetY = offsetY / 2;
+    auto octetZ = offsetZ / 2;
+
+    auto octetsPerBlockPerDim = grid.blockDim / 2;
+
+    auto octetIdx = octetZ * octetsPerBlockPerDim * octetsPerBlockPerDim + octetY * octetsPerBlockPerDim + octetX;
+
+    auto octCoordX = x % 2;
+    auto octCoordY = y % 2;
+    auto octCoordZ = z % 2;
+
+    return getOctetValue(block.octets[octetIdx], octCoordX, octCoordY, octCoordZ);
+  }
 
   struct TransitionRule
   {
@@ -116,6 +146,13 @@ namespace rol
     Game& operator=(const Game&) = delete;
 
     virtual void initRandomPrimordialSoup(int seed = 2360) = 0;
+
+    virtual bool isAlive(int x, int y, int z) const = 0;
+
+    int cellsPerDim() const { return m_cellsPerDim; }
+
+  private:
+    int m_cellsPerDim;
   };
 
   

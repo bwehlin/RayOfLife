@@ -10,6 +10,7 @@ size_t getCellIndex(size_t i, size_t j, size_t k, size_t strideI, size_t strideJ
 }
 
 rol::Game::Game(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz)
+  : m_cellsPerDim(nCellsPerDimension)
 {
   if (nCellsPerDimension % 2 != 0)
   {

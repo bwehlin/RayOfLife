@@ -25,7 +25,7 @@ rol::CpuGame::~CpuGame()
 void
 rol::CpuGame::initGrid()
 {
-  auto nBlocksPerDim = m_nCellsPerDimension / m_blockSz / 2;
+  auto nBlocksPerDim = (m_nCellsPerDimension / m_blockSz + 1) / 2;
 
   m_grid.blockDim = m_blockSz;
   m_grid.blockCount = nBlocksPerDim;
@@ -43,7 +43,7 @@ rol::CpuGame::initGrid()
 void
 rol::CpuGame::initRandomPrimordialSoup(int seed)
 {
-  auto nBlocksPerDim = m_nCellsPerDimension / m_blockSz / 2;
+  auto nBlocksPerDim = (m_nCellsPerDimension / m_blockSz + 1) / 2;
   auto nBlocksTotal = nBlocksPerDim * nBlocksPerDim * nBlocksPerDim;
   auto nOctetsPerDim = m_blockSz / 2;
   auto nOctetsPerBlock = nOctetsPerDim * nOctetsPerDim * nOctetsPerDim;
@@ -58,4 +58,9 @@ rol::CpuGame::initRandomPrimordialSoup(int seed)
       m_grid.blocks[i].octets[j] = static_cast<std::uint8_t>(dist(gen));
     }
   }
+}
+
+bool rol::CpuGame::isAlive(int x, int y, int z) const
+{
+  return rol::isAlive(m_grid, x, y, z);
 }

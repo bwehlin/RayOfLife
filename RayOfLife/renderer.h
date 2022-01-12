@@ -44,6 +44,11 @@ namespace rol
     void setMaxDepth(int depth) { m_maxDepth = depth; }
     [[nodiscard]] int maxDepth() const { return m_maxDepth; }
 
+    [[nodiscard]] fptype3 sphereColor() const noexcept { return m_sphereColor; }
+    [[nodiscard]] fptype sphereDiffuseC() const noexcept { return m_sphereDiffuseC; }
+    [[nodiscard]] fptype sphereSpecularC() const noexcept { return m_sphereSpecularC; }
+    [[nodiscard]] fptype sphereReflection() const noexcept { return m_sphereReflection; }
+    
   private:
     // Returns a w*h array of fptype (0-1). The array should be strided on w (row major).
     // The x component represents red, y green and z blue. In other words, the array can
@@ -57,5 +62,11 @@ namespace rol
     bool m_imageIsCurrent = false;
 
     int m_maxDepth = 5;
+
+    fptype3 m_sphereColor = { 1.f, .572f, .184f };
+    fptype m_sphereDiffuseC = 1.f;
+    fptype m_sphereSpecularC = 1.f;
+    fptype m_sphereReflection = 0.5f;
+    
   };
 }

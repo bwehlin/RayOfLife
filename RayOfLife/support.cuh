@@ -37,3 +37,18 @@ __device__ __host__ __inline__ fptype3 makeFp3(fptype x, fptype y, fptype z)
 }
 
 #endif
+
+namespace rol
+{
+  // Apparently, there is no cuda::std::min/max as far as I can tell...
+
+  __device__ __host__ __inline__ fptype min(fptype a, fptype b)
+  {
+    return a < b ? a : b;
+  }
+
+  __device__ __host__ __inline__ fptype max(fptype a, fptype b)
+  {
+    return a > b ? a : b;
+  }
+}

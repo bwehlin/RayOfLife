@@ -15,6 +15,8 @@ namespace rol
 
     void initRandomPrimordialSoup(int seed = 2360) override;
 
+    bool isAlive(int x, int y, int z) const override;
+
   private:
     void initGrid();
     

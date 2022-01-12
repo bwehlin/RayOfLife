@@ -50,7 +50,7 @@ namespace rol
     auto x = dot(posInPlane, referenceVec);
     auto y = norm(posInPlane) / x;
 
-    auto angle = std::acosf(x / (norm(posInPlane) * norm(referenceVec)));
+    auto angle = cuda::std::acos(x / (norm(posInPlane) * norm(referenceVec)));
     if (angle < 0)
     {
       y = -y;

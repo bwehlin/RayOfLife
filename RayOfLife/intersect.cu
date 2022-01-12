@@ -4,13 +4,12 @@
 
 #include <cuda/std/utility>
 #include <cuda/std/limits>
+#include <cuda/std/utility>
 
-__host__ __device__
-fptype intersectSphere(fptype3 rayOrigin, fptype3 rayDirection, const rol::SphereData& sphere)
+__host__ __device__ 
+fptype
+rol::intersectSphere(const fptype3& rayOrigin, const fptype3& rayDirection, fptype3 sphereCenter, fptype sphereRadius)
 {
-  auto sphereCenter = sphere.position;
-  auto sphereRadius = sphere.radius;
-
   auto a = dot(rayDirection, rayDirection);
   auto os = rayOrigin - sphereCenter;
   auto b = 2.f * dot(rayDirection, os);
@@ -35,17 +34,45 @@ fptype intersectSphere(fptype3 rayOrigin, fptype3 rayDirection, const rol::Spher
 }
 
 __host__ __device__
-fptype intersectPlane(fptype3 rayOrigin, fptype3 rayDirection, const rol::PlaneData& plane)
+rol::RayIntersection 
+rol::traceRay(const fptype3& rayOrigin, const fptype3& rayDirection, const int3& gridPos, const SceneData& scene, const Camera& camera)
 {
-  auto denom = dot(rayDirection, plane.normal);
-  if (abs(denom) < 1e-6f)
+  RayIntersection intersection;
+
+  fptype3 sphereCenter;
+  sphereCenter.x = static_cast<fptype>(gridPos.x) + .5f;
+  sphereCenter.y = static_cast<fptype>(gridPos.y) + .5f;
+  sphereCenter.z = static_cast<fptype>(gridPos.z) + .5f;
+
+  auto sphereRadius = scene.sphereRaidus;
+  
+  auto t = intersectSphere(rayOrigin, rayDirection, sphereCenter, sphereRadius);
+  if (t == cuda::std::numeric_limits<fptype>::infinity())
   {
-    return cuda::std::numeric_limits<fptype>::infinity();
+    intersection.hit = false;
+    return intersection;
   }
-  auto d = dot(plane.position - rayOrigin, plane.normal) / denom;
-  if (d < 0.f)
-  {
-    return cuda::std::numeric_limits<fptype>::infinity();
-  }
-  return d;
+
+  intersection.point = rayOrigin + t * rayDirection;
+  intersection.normal = normalize(intersection.point - sphereCenter);
+  
+  auto toLight = normalize(scene.lightPos - intersection.point);
+  auto toCameraOrigin = normalize(camera.origin - intersection.point);
+
+  auto objColor = scene.sphereColor;
+  intersection.color = scene.ambient;
+
+  auto diffuse = scene.sphereDiffuseC * rol::max(dot(intersection.normal, toLight), 0.f);
+  auto diffuseColor = diffuse * objColor;
+  intersection.color += diffuseColor;
+
+  auto specular = scene.sphereSpecularC * rol::max(dot(intersection.normal, normalize(toLight + toCameraOrigin)), 0.f);
+  
+  // TODO: pow GPU
+  specular = pow(specular, scene.specularK);
+  intersection.color += specular * scene.lightColor;
+
+  intersection.hit = true;
+
+  return intersection;
 }

@@ -1,8 +1,12 @@
 #include "cpu_renderer.h"
 #include "support.cuh"
+
 #include <stdexcept>
 
 #include "vector_math.cuh"
+#include "amantides_woo.cuh"
+#include "intersect.cuh"
+#include "game.cuh"
 
 rol::CpuRenderer::CpuRenderer(size_t w, size_t h)
   : Renderer(w, h)
@@ -37,7 +41,7 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
   {
     for (auto ix = 0ul; ix < wPixels; ++ix)
     {
-      renderPixel(ix, iy, xspace, yspace, camera);
+      renderPixel(ix, iy, xspace, yspace, game, camera);
     }
   }
 }
@@ -45,18 +49,43 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
 void
 rol::CpuRenderer::renderPixel(int ix, int iy, 
   const std::vector<fptype>& xspace, const std::vector<fptype>& yspace, 
-  const Camera& camera)
+  const Game& game, const Camera& camera)
 {
   auto y = yspace[iy];
   auto x = xspace[ix];
 
   auto rayOrigin = camera.origin;
-  auto cameraTarget = makeFp3(x, y, 0.f); // TODO: Viewing planes...
+  auto cameraTarget = makeFp3(0.f, x, y); // TODO: Viewing planes...
 
   auto rayDirection = normalize(cameraTarget - rayOrigin);
 
   auto color = makeFp3(0.f, 0.f, 0.f);
   auto reflection = 1.f;
+
+  auto& pixel = m_imageData[iy * width() + ix];
+  pixel.x = 0;
+  pixel.y = 0;
+  pixel.z = 0;
+
+  auto cellsPerDim = game.cellsPerDim();
+  auto awstate = rol::initAmantidesWoo(camera.origin, rayDirection, cellsPerDim);
+  if (awstate.pos.x != 0)
+  {
+    // Ray from origin does not hit cell grid
+    return;
+  }
+
+  auto reflection = 1.f;
+
+  auto depth = maxDepth();
+  while (depth--)
+  {
+    auto intersection = castRay(awstate, rayOrigin, rayDirection, game, camera);
+    if (!intersection.hit)
+    {
+
+    }
+  }
 
 #if 0
   for (auto depth = 0; depth < maxDepth(); ++depth)
@@ -83,4 +112,35 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
     static_cast<unsigned char>(color.y),
     static_cast<unsigned char>(color.z));
 #endif
+}
+
+rol::RayIntersection
+rol::CpuRenderer::castRay(AmantidesWooState& awstate, fptype3 rayOrigin, fptype3 rayDirection, const Game& game, const Camera& camera)
+{
+  auto cellsPerDim = game.cellsPerDim();
+  while (true)
+  {
+    if (awstate.pos.x < 0 || awstate.pos.x >= cellsPerDim
+      || awstate.pos.y < 0 || awstate.pos.y >= cellsPerDim
+      || awstate.pos.z < 0 || awstate.pos.z >= cellsPerDim)
+    {
+      // We have fallen out of the cell grid
+      return;
+    }
+
+    if (game.isAlive(awstate.pos.x, awstate.pos.y, awstate.pos.z))
+    {
+      auto intersection = traceRay(rayOrigin, rayDirection, awstate.pos, m_scene, camera);
+      if (intersection.hit)
+      {
+        return intersection;
+      }
+    }
+
+    nextAwStep(awstate);
+  }
+
+  RayIntersection intersection;
+  intersection.hit = false;
+  return intersection;
 }

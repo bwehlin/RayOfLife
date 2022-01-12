@@ -44,6 +44,9 @@
       <Filter>Math</Filter>
     </ClInclude>
     <ClInclude Include="support.cuh" />
+    <ClInclude Include="scene_data.cuh">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
