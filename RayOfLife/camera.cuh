@@ -7,14 +7,14 @@ namespace rol
   struct Camera
   {
     float3 origin;
-    float3 target;
+    float3 direction;
   };
 
-  inline Camera makeCamera(float3 origin, float3 target)
+  inline Camera makeCamera(float3 origin, float3 direction)
   {
     Camera camera;
     camera.origin = origin;
-    camera.target = target;
+    camera.direction = direction;
     return camera;
   }
 }

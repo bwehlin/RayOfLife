@@ -100,6 +100,7 @@
     <CudaCompile Include="intersect.cu" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="amantides_woo.cuh" />
     <ClInclude Include="camera.cuh" />
     <ClInclude Include="cpu_game.h" />
     <ClInclude Include="game.cuh" />

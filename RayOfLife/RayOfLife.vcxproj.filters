@@ -40,6 +40,9 @@
     <ClInclude Include="camera.cuh">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="amantides_woo.cuh">
+      <Filter>Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

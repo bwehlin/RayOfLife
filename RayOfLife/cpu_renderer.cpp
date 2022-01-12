@@ -36,7 +36,7 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
   {
     for (auto ix = 0ul; ix < wPixels; ++ix)
     {
-      renderPixel(ix, iy, xspace, yspace);
+      renderPixel(ix, iy, xspace, yspace, camera);
     }
   }
 }
@@ -57,6 +57,7 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto color = make_float3(0.f, 0.f, 0.f);
   auto reflection = 1.f;
 
+#if 0
   for (auto depth = 0; depth < maxDepth(); ++depth)
   {
     auto intersection = traceRay(rayOrigin, rayDirection, scene);
@@ -80,4 +81,5 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
     static_cast<unsigned char>(color.x),
     static_cast<unsigned char>(color.y),
     static_cast<unsigned char>(color.z));
+#endif
 }

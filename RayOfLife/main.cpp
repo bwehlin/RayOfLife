@@ -264,13 +264,25 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
 
 #include "cpu_game.h"
 #include "cpu_renderer.h"
+#include "amantides_woo.cuh"
 
 int main(int, char**)
 {
   rol::CpuGame game(rol::make5766rule(), 16);
-  rol::CpuRenderer renderer(640, 480);
 
+  auto camera = rol::makeCamera(make_float3(0.f, 0.f, 0.f), make_float3(0.3f, 0.5f, 0.7f));
+
+  rol::CpuRenderer renderer(640, 480);
   game.initRandomPrimordialSoup(2360);
+
+  renderer.render(game, camera);
+
+  auto state = rol::initAmantidesWoo(camera.origin, camera.direction);
+  while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
+  {
+    std::cout << "At " << state.pos.x << ", " << state.pos.y << ", " << state.pos.z << std::endl;
+    rol::nextAwStep(state);
+  }
 
   return EXIT_SUCCESS;
 }
