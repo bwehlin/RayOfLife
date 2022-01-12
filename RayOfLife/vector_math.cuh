@@ -1,15 +1,16 @@
 ﻿#pragma once
 
 #include <cuda_runtime.h>
+#include "support.cuh"
 
 __host__ __device__ inline
-float norm(float3 in)
+fptype norm(fptype3 in)
 {
-  return sqrtf(in.x * in.x + in.y * in.y + in.z * in.z);
+  return sqrt(in.x * in.x + in.y * in.y + in.z * in.z);
 }
 
 __host__ __device__ inline
-float3 normalize(float3 in)
+fptype3 normalize(fptype3 in)
 {
   auto normVal = norm(in);
   in.x /= normVal;
@@ -19,13 +20,13 @@ float3 normalize(float3 in)
 }
 
 __host__ __device__ inline
-float dot(float3 a, float3 b)
+fptype dot(fptype3 a, fptype3 b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 __host__ __device__ inline
-float3 operator+(float3 a, float3 b)
+fptype3 operator+(fptype3 a, fptype3 b)
 {
   a.x += b.x;
   a.y += b.y;
@@ -34,7 +35,7 @@ float3 operator+(float3 a, float3 b)
 }
 
 __host__ __device__ inline
-float3& operator+=(float3& a, float3 b)
+fptype3& operator+=(fptype3& a, fptype3 b)
 {
   a.x += b.x;
   a.y += b.y;
@@ -43,7 +44,7 @@ float3& operator+=(float3& a, float3 b)
 }
 
 __host__ __device__ inline
-float3 operator-(float3 a, float3 b)
+fptype3 operator-(fptype3 a, fptype3 b)
 {
   a.x -= b.x;
   a.y -= b.y;
@@ -52,7 +53,7 @@ float3 operator-(float3 a, float3 b)
 }
 
 __host__ __device__ inline
-float3 operator*(float c, float3 v)
+fptype3 operator*(fptype c, fptype3 v)
 {
   v.x *= c;
   v.y *= c;
@@ -61,7 +62,7 @@ float3 operator*(float c, float3 v)
 }
 
 __host__ __device__ inline
-float3 operator*(float3 v, float c)
+fptype3 operator*(fptype3 v, fptype c)
 {
   v.x *= c;
   v.y *= c;
@@ -70,12 +71,12 @@ float3 operator*(float3 v, float c)
 }
 
 __host__ __device__ inline
-void linspace(float* out, float from, float to, std::size_t n)
+void linspace(fptype* out, fptype from, fptype to, std::size_t n)
 {
-  auto step = (to - from) / static_cast<float>(n);
+  auto step = (to - from) / static_cast<fptype>(n);
   for (std::size_t i = 0; i + 1 < n; ++i)
   {
-    out[i] = from + static_cast<float>(i) * step;
+    out[i] = from + static_cast<fptype>(i) * step;
   }
   out[n - 1] = to; // Don't rely on FP arithmetic to reach 'to'
 }

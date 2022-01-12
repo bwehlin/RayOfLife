@@ -1,16 +1,17 @@
 ﻿#pragma once
 
+#include "support.cuh"
 #include <cuda_runtime.h>
 
 namespace rol
 {
   struct Camera
   {
-    float3 origin;
-    float3 direction;
+    fptype3 origin;
+    fptype3 direction;
   };
 
-  inline Camera makeCamera(float3 origin, float3 direction)
+  inline Camera makeCamera(fptype3 origin, fptype3 direction)
   {
     Camera camera;
     camera.origin = origin;

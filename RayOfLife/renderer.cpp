@@ -24,7 +24,7 @@ rol::Renderer::writeChannelsToImage()
 
   auto const& dstImageView = boost::gil::view(m_image);
 
-  const float3* data = imageData();
+  const fptype3* data = imageData();
 
   auto w = width();
   auto h = height();

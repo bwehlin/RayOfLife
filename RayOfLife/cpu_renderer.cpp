@@ -1,4 +1,5 @@
 #include "cpu_renderer.h"
+#include "support.cuh"
 #include <stdexcept>
 
 #include "vector_math.cuh"
@@ -6,10 +7,10 @@
 rol::CpuRenderer::CpuRenderer(size_t w, size_t h)
   : Renderer(w, h)
 {
-  m_imageData = std::make_unique<float3[]>(w * h);
+  m_imageData = std::make_unique<fptype3[]>(w * h);
 }
 
-const float3*
+const fptype3*
 rol::CpuRenderer::imageData() const
 {
   return m_imageData.get();
@@ -20,14 +21,14 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
 {
   auto aspect = aspectRatio();
 
-  auto screenMin = make_float2(-1.f, -1.f / aspect + .25f);
-  auto screenMax = make_float2(1.f, 1.f / aspect + .25f);
+  auto screenMin = makeFp2(-1.f, -1.f / aspect + .25f);
+  auto screenMax = makeFp2(1.f, 1.f / aspect + .25f);
 
   auto wPixels = width();
   auto hPixels = height();
 
-  std::vector<float> xspace(wPixels);
-  std::vector<float> yspace(hPixels);
+  std::vector<fptype> xspace(wPixels);
+  std::vector<fptype> yspace(hPixels);
 
   linspace(xspace.data(), screenMin.x, screenMax.x, wPixels);
   linspace(yspace.data(), screenMin.y, screenMax.y, hPixels);
@@ -43,18 +44,18 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
 
 void
 rol::CpuRenderer::renderPixel(int ix, int iy, 
-  const std::vector<float>& xspace, const std::vector<float>& yspace, 
+  const std::vector<fptype>& xspace, const std::vector<fptype>& yspace, 
   const Camera& camera)
 {
   auto y = yspace[iy];
   auto x = xspace[ix];
 
   auto rayOrigin = camera.origin;
-  auto cameraTarget = make_float3(x, y, 0.f); // TODO: Viewing planes...
+  auto cameraTarget = makeFp3(x, y, 0.f); // TODO: Viewing planes...
 
   auto rayDirection = normalize(cameraTarget - rayOrigin);
 
-  auto color = make_float3(0.f, 0.f, 0.f);
+  auto color = makeFp3(0.f, 0.f, 0.f);
   auto reflection = 1.f;
 
 #if 0

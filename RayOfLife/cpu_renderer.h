@@ -3,6 +3,8 @@
 #include <memory>
 #include <vector>
 
+#include "support.cuh"
+
 #include "renderer.h"
 
 namespace rol
@@ -15,10 +17,10 @@ namespace rol
     void render(const Game& game, const Camera& camera) override;
 
   private:
-    const float3* imageData() const override;
+    const fptype3* imageData() const override;
 
-    void renderPixel(int ix, int iy, const std::vector<float>& xspace, const std::vector<float>& yspace, const Camera& camera);
+    void renderPixel(int ix, int iy, const std::vector<fptype>& xspace, const std::vector<fptype>& yspace, const Camera& camera);
 
-    std::unique_ptr<float3[]> m_imageData;
+    std::unique_ptr<fptype3[]> m_imageData;
   };
 }

@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "support.cuh"
+
 #include <cuda_runtime.h>
 #include <cuda/std/limits>
 
@@ -10,13 +12,13 @@ namespace rol
 
   struct AmantidesWooState
   {
-    float3 tDelta;
-    float3 tMax;
+    fptype3 tDelta;
+    fptype3 tMax;
     int3 step;
     int3 pos;
   };
 
-  __host__ __device__ AmantidesWooState initAmantidesWoo(float3 origin, float3 direction)
+  __host__ __device__ AmantidesWooState initAmantidesWoo(fptype3 origin, fptype3 direction)
   {
     AmantidesWooState state;
     state.pos = make_int3(0, 0, 0); // TODO
@@ -33,9 +35,9 @@ namespace rol
       : direction.z > 0 ? 1
       : 0;
 
-    state.tDelta.x = direction.x != 0.f ? 1.f / direction.x : cuda::std::numeric_limits<float>::infinity();
-    state.tDelta.y = direction.y != 0.f ? 1.f / direction.y : cuda::std::numeric_limits<float>::infinity();
-    state.tDelta.z = direction.z != 0.f ? 1.f / direction.z : cuda::std::numeric_limits<float>::infinity();
+    state.tDelta.x = direction.x != 0.f ? 1.f / direction.x : cuda::std::numeric_limits<fptype>::infinity();
+    state.tDelta.y = direction.y != 0.f ? 1.f / direction.y : cuda::std::numeric_limits<fptype>::infinity();
+    state.tDelta.z = direction.z != 0.f ? 1.f / direction.z : cuda::std::numeric_limits<fptype>::infinity();
 
     state.tMax.x = 1.f / direction.x; // TODO
     state.tMax.y = 1.f / direction.y; // TODO

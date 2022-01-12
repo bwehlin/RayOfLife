@@ -1,11 +1,12 @@
 ﻿#include "intersect.cuh"
+#include "support.cuh"
 #include "vector_math.cuh"
 
 #include <cuda/std/utility>
 #include <cuda/std/limits>
 
 __host__ __device__
-float intersectSphere(float3 rayOrigin, float3 rayDirection, const rol::SphereData& sphere)
+fptype intersectSphere(fptype3 rayOrigin, fptype3 rayDirection, const rol::SphereData& sphere)
 {
   auto sphereCenter = sphere.position;
   auto sphereRadius = sphere.radius;
@@ -17,7 +18,7 @@ float intersectSphere(float3 rayOrigin, float3 rayDirection, const rol::SphereDa
   auto disc = b * b - 4 * a * c;
   if (disc > 0.f)
   {
-    auto distSqrt = sqrtf(disc);
+    auto distSqrt = sqrt(disc);
     auto q = b < 0. ? (-b - distSqrt) / 2.f : (-b + distSqrt) / 2.f;
     auto t0 = q / a;
     auto t1 = c / q;
@@ -30,21 +31,21 @@ float intersectSphere(float3 rayOrigin, float3 rayDirection, const rol::SphereDa
       return (t0 < 0.) ? t1 : t0;
     }
   }
-  return cuda::std::numeric_limits<float>::infinity();
+  return cuda::std::numeric_limits<fptype>::infinity();
 }
 
 __host__ __device__
-float intersectPlane(float3 rayOrigin, float3 rayDirection, const rol::PlaneData& plane)
+fptype intersectPlane(fptype3 rayOrigin, fptype3 rayDirection, const rol::PlaneData& plane)
 {
   auto denom = dot(rayDirection, plane.normal);
-  if (fabsf(denom) < 1e-6f)
+  if (abs(denom) < 1e-6f)
   {
-    return cuda::std::numeric_limits<float>::infinity();
+    return cuda::std::numeric_limits<fptype>::infinity();
   }
   auto d = dot(plane.position - rayOrigin, plane.normal) / denom;
   if (d < 0.f)
   {
-    return cuda::std::numeric_limits<float>::infinity();
+    return cuda::std::numeric_limits<fptype>::infinity();
   }
   return d;
 }

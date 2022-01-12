@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cuda_runtime.h>
+#include "support.cuh"
 
 #ifdef _MSC_VER
 #pragma warning(push)
@@ -34,7 +35,7 @@ namespace rol
     [[nodiscard]] size_t height() const { return m_image.height(); }
 
     // Returns width / height.
-    [[nodiscard]] float aspectRatio() const { return static_cast<float>(width()) / static_cast<float>(height()); }
+    [[nodiscard]] fptype aspectRatio() const { return static_cast<fptype>(width()) / static_cast<fptype>(height()); }
 
     void saveFrameBmp(const char* filename);
 
@@ -44,10 +45,10 @@ namespace rol
     [[nodiscard]] int maxDepth() const { return m_maxDepth; }
 
   private:
-    // Returns a w*h array of float (0-1). The array should be strided on w (row major).
+    // Returns a w*h array of fptype (0-1). The array should be strided on w (row major).
     // The x component represents red, y green and z blue. In other words, the array can
     // be thought of as RGB scanlines stacked one after another.
-    [[nodiscard]] virtual const float3* imageData() const = 0;
+    [[nodiscard]] virtual const fptype3* imageData() const = 0;
 
     // Writes channel data from the derived Renderer into m_image (for subsequent export).
     void writeChannelsToImage();

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <cuda_runtime.h>
+#include "support.cuh"
 #include <vector>
 
 namespace rol
@@ -13,30 +14,30 @@ namespace rol
 
   struct Texture
   {
-    std::vector<float3> pixels;
+    std::vector<fptype3> pixels;
     int w;
   };
 
   struct PlaneData
   {
-    float3 position;
-    float3 normal;
+    fptype3 position;
+    fptype3 normal;
     const Texture* texture;
   };
 
   struct SphereData
   {
-    float3 position;
-    float3 colorRgb;
-    float radius;
+    fptype3 position;
+    fptype3 colorRgb;
+    fptype radius;
   };
 
   struct SceneObject
   {
     SceneObjectType type;
-    float reflection;
-    float diffuseC;
-    float specularC;
+    fptype reflection;
+    fptype diffuseC;
+    fptype specularC;
     union
     {
       PlaneData plane;
@@ -44,7 +45,7 @@ namespace rol
     } data;
   };
 
-  inline SceneObject makeSphere(float3 pos, float radius, float3 color)
+  inline SceneObject makeSphere(fptype3 pos, fptype radius, fptype3 color)
   {
     SceneObject ret;
     ret.type = SceneObjectType::Sphere;
@@ -57,7 +58,7 @@ namespace rol
     return ret;
   }
 
-  inline SceneObject makePlane(float3 pos, float3 normal)
+  inline SceneObject makePlane(fptype3 pos, fptype3 normal)
   {
     SceneObject ret;
     ret.type = SceneObjectType::Plane;

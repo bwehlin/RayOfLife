@@ -109,6 +109,7 @@
     <ClInclude Include="renderer.h" />
     <ClInclude Include="scene_object.h" />
     <ClInclude Include="scene_object_functions.cuh" />
+    <ClInclude Include="support.cuh" />
     <ClInclude Include="vector_math.cuh" />
   </ItemGroup>
   <ItemGroup>

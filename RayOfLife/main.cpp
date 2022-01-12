@@ -56,17 +56,17 @@ struct Scene
   std::vector<rol::SceneObject> objects;
 
   // Default light and material parameters.
-  float3 ambient;
-  float diffuseC = 1.f;
-  float specularC = 1.f;
-  float specularK = 50.f;
+  fptype3 ambient;
+  fptype diffuseC = 1.f;
+  fptype specularC = 1.f;
+  fptype specularK = 50.f;
 
-  float reflection = 1.f;
+  fptype reflection = 1.f;
 
-  float3 lightPos;
-  float3 lightColor;
+  fptype3 lightPos;
+  fptype3 lightColor;
 
-  float3 cameraOrigin;
+  fptype3 cameraOrigin;
 };
 
 
@@ -74,35 +74,35 @@ Scene makeScene()
 {
   Scene scene;
 
-  scene.cameraOrigin = make_float3(0.f, .35f, -1.f);
-  scene.ambient = make_float3(0.05f, 0.05f, 0.05f);
+  scene.cameraOrigin = makeFp3(0.f, .35f, -1.f);
+  scene.ambient = makeFp3(0.05f, 0.05f, 0.05f);
 
-  scene.lightPos = make_float3(5.f, 5.f, -10.f);
-  scene.lightColor = make_float3(1.f, 1.f, 1.f);
+  scene.lightPos = makeFp3(5.f, 5.f, -10.f);
+  scene.lightColor = makeFp3(1.f, 1.f, 1.f);
 
-  scene.objects.emplace_back(rol::makeSphere(make_float3(.75f, .1f, 1.f), .6f, make_float3(0.f, 0.f, 1.f)));
-  scene.objects.emplace_back(rol::makeSphere(make_float3(-.75f, .1f, 2.25f), .6f, make_float3(.5f, .223f, .5f)));
-  scene.objects.emplace_back(rol::makeSphere(make_float3(-2.75f, .1f, 3.5f), .6f, make_float3(1.f, .572f, .184f)));
+  scene.objects.emplace_back(rol::makeSphere(makeFp3(.75f, .1f, 1.f), .6f, makeFp3(0.f, 0.f, 1.f)));
+  scene.objects.emplace_back(rol::makeSphere(makeFp3(-.75f, .1f, 2.25f), .6f, makeFp3(.5f, .223f, .5f)));
+  scene.objects.emplace_back(rol::makeSphere(makeFp3(-2.75f, .1f, 3.5f), .6f, makeFp3(1.f, .572f, .184f)));
 
-  scene.objects.emplace_back(rol::makePlane(make_float3(0.f, -.5f, 0.f), make_float3(0., 1., 0.)));
+  scene.objects.emplace_back(rol::makePlane(makeFp3(0.f, -.5f, 0.f), makeFp3(0., 1., 0.)));
 
   return scene;
 }
 
-std::vector<float> linspace(float from, float to, std::size_t n)
+std::vector<fptype> linspace(fptype from, fptype to, std::size_t n)
 {
-  auto step = (to - from) / static_cast<float>(n);
-  std::vector<float> ret;
+  auto step = (to - from) / static_cast<fptype>(n);
+  std::vector<fptype> ret;
   ret.resize(n);
   for (std::size_t i = 0; i + 1 < n; ++i)
   {
-    ret[i] = from + static_cast<float>(i) * step;
+    ret[i] = from + static_cast<fptype>(i) * step;
   }
   ret[n-1] = to; // Don't rely on FP arithmetic to reach 'to'
   return ret;
 }
 
-float intersect(float3 rayOrigin, float3 rayDirection, const rol::SceneObject& obj)
+fptype intersect(fptype3 rayOrigin, fptype3 rayDirection, const rol::SceneObject& obj)
 {
   switch (obj.type)
   {
@@ -110,25 +110,25 @@ float intersect(float3 rayOrigin, float3 rayDirection, const rol::SceneObject& o
   case rol::SceneObjectType::Plane: return intersectPlane(rayOrigin, rayDirection, obj.data.plane);
   }
 
-  return std::numeric_limits<float>::infinity();
+  return std::numeric_limits<fptype>::infinity();
 }
 
 struct RayIntersection
 {
   std::vector<rol::SceneObject>::const_iterator obj;
-  float3 point;
-  float3 normal;
-  float3 color;
+  fptype3 point;
+  fptype3 normal;
+  fptype3 color;
 };
 
 
 
-RayIntersection traceRay(float3 rayOrigin, float3 rayDirection, const Scene& scene)
+RayIntersection traceRay(fptype3 rayOrigin, fptype3 rayDirection, const Scene& scene)
 {
   RayIntersection intersection;
 
   // Find first point of intersection
-  auto t = std::numeric_limits<float>::infinity();
+  auto t = std::numeric_limits<fptype>::infinity();
 
   intersection.obj = scene.objects.end();
   for (auto it = scene.objects.begin(); it != scene.objects.end(); ++it)
@@ -154,7 +154,7 @@ RayIntersection traceRay(float3 rayOrigin, float3 rayDirection, const Scene& sce
 
   auto shadowTestVec = intersection.point + intersection.normal * 0.0001f;
   auto isShadowed = std::any_of(scene.objects.begin(), scene.objects.end(), [&shadowTestVec, &toLight](const rol::SceneObject& obj) {
-    return intersect(shadowTestVec, toLight, obj) < std::numeric_limits<float>::infinity();
+    return intersect(shadowTestVec, toLight, obj) < std::numeric_limits<fptype>::infinity();
     });
 
   if (isShadowed)
@@ -180,10 +180,10 @@ RayIntersection traceRay(float3 rayOrigin, float3 rayDirection, const Scene& sce
 
 void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
 {
-  auto aspectRatio = static_cast<float>(dstImage.width()) / static_cast<float>(dstImage.height());
+  auto aspectRatio = static_cast<fptype>(dstImage.width()) / static_cast<fptype>(dstImage.height());
   
-  auto screenMin = make_float2(-1.f, -1.f / aspectRatio + .25f);
-  auto screenMax = make_float2(1.f, 1.f / aspectRatio + .25f);
+  auto screenMin = makeFp2(-1.f, -1.f / aspectRatio + .25f);
+  auto screenMax = makeFp2(1.f, 1.f / aspectRatio + .25f);
 
   auto wPixels = dstImage.width();
   auto hPixels = dstImage.height();
@@ -201,12 +201,12 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
     for (auto ix = 0ul; ix < wPixels; ++ix)
     {
       auto x = xspace[ix];
-      auto cameraTarget = make_float3(x, y, 0.f);
+      auto cameraTarget = makeFp3(x, y, 0.f);
 
       auto rayOrigin = scene.cameraOrigin;
       auto rayDirection = normalize(cameraTarget - rayOrigin);
 
-      auto color = make_float3(0.f, 0.f, 0.f);
+      auto color = makeFp3(0.f, 0.f, 0.f);
       auto reflection = 1.f;
       
       for (auto depth = 0; depth < maxDepth; ++depth)
@@ -270,7 +270,7 @@ int main(int, char**)
 {
   rol::CpuGame game(rol::make5766rule(), 16);
 
-  auto camera = rol::makeCamera(make_float3(0.f, 0.f, 0.f), make_float3(0.3f, 0.5f, 0.7f));
+  auto camera = rol::makeCamera(makeFp3(0.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f));
 
   rol::CpuRenderer renderer(640, 480);
   game.initRandomPrimordialSoup(2360);

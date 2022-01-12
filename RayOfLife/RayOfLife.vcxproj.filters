@@ -43,6 +43,7 @@
     <ClInclude Include="amantides_woo.cuh">
       <Filter>Math</Filter>
     </ClInclude>
+    <ClInclude Include="support.cuh" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
