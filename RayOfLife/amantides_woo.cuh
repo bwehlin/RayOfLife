@@ -18,10 +18,24 @@ namespace rol
     int3 pos;
   };
 
-  __host__ __device__ AmantidesWooState initAmantidesWoo(fptype3 origin, fptype3 direction)
+  __host__ __device__ AmantidesWooState initAmantidesWoo(fptype3 origin, fptype3 direction, int nCellsPerDim)
   {
     AmantidesWooState state;
+
+    fptype maxBoundaryCoord = static_cast<fptype>(nCellsPerDim) + 1.f;
+
     state.pos = make_int3(0, 0, 0); // TODO
+
+    if (origin.x >= 0.f && origin.x < maxBoundaryCoord
+      && origin.y >= 0.f && origin.y < maxBoundaryCoord
+      && origin.z >= 0.f && origin.z < maxBoundaryCoord)
+    {
+      // Ray starts inside cell cube
+
+      state.pos.x = static_cast<int>(origin.x); // Assuming unit length for the cells
+      state.pos.y = static_cast<int>(origin.y);
+      state.pos.z = static_cast<int>(origin.z);
+    }
 
     state.step.x = direction.x < 0 ? -1
       : direction.x > 0 ? 1
@@ -35,13 +49,38 @@ namespace rol
       : direction.z > 0 ? 1
       : 0;
 
-    state.tDelta.x = direction.x != 0.f ? 1.f / direction.x : cuda::std::numeric_limits<fptype>::infinity();
-    state.tDelta.y = direction.y != 0.f ? 1.f / direction.y : cuda::std::numeric_limits<fptype>::infinity();
-    state.tDelta.z = direction.z != 0.f ? 1.f / direction.z : cuda::std::numeric_limits<fptype>::infinity();
+    if (direction.x != 0.f)
+    {
+      state.tDelta.x = fptype{ 1.f } / direction.x;
+      state.tMax.x = (fptype{ 1.f } + static_cast<fptype>(state.pos.x) - origin.x) / direction.x;
+    }
+    else
+    {
+      state.tDelta.x = cuda::std::numeric_limits<fptype>::infinity();
+      state.tMax.x = cuda::std::numeric_limits<fptype>::infinity();
+    }
 
-    state.tMax.x = 1.f / direction.x; // TODO
-    state.tMax.y = 1.f / direction.y; // TODO
-    state.tMax.z = 1.f / direction.z; // TODO
+    if (direction.y != 0.f)
+    {
+      state.tDelta.y = fptype{ 1.f } / direction.y;
+      state.tMax.y = (fptype{ 1.f } + static_cast<fptype>(state.pos.y) - origin.y) / direction.y;
+    }
+    else
+    {
+      state.tDelta.y = cuda::std::numeric_limits<fptype>::infinity();
+      state.tMax.y = cuda::std::numeric_limits<fptype>::infinity();
+    }
+
+    if (direction.z != 0.f)
+    {
+      state.tDelta.z = fptype{ 1.f } / direction.z;
+      state.tMax.z = (fptype{ 1.f } + static_cast<fptype>(state.pos.z) - origin.z) / direction.z;
+    }
+    else
+    {
+      state.tDelta.z = cuda::std::numeric_limits<fptype>::infinity();
+      state.tMax.z = cuda::std::numeric_limits<fptype>::infinity();
+    }
 
     return state;
   }

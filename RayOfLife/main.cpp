@@ -277,7 +277,7 @@ int main(int, char**)
 
   renderer.render(game, camera);
 
-  auto state = rol::initAmantidesWoo(camera.origin, camera.direction);
+  auto state = rol::initAmantidesWoo(camera.origin, camera.direction, 16);
   while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
   {
     std::cout << "At " << state.pos.x << ", " << state.pos.y << ", " << state.pos.z << std::endl;
