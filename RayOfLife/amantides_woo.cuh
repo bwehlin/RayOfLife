@@ -18,7 +18,7 @@ namespace rol
     int3 pos;
   };
 
-  __host__ __device__ AmantidesWooState initAmantidesWoo(fptype3 origin, fptype3 direction, int nCellsPerDim)
+  __host__ __device__ __inline__ AmantidesWooState initAmantidesWoo(fptype3 origin, fptype3 direction, int nCellsPerDim)
   {
     AmantidesWooState state;
 
@@ -111,7 +111,7 @@ namespace rol
     return state;
   }
 
-  __host__ __device__ void nextAwStep(AmantidesWooState& state)
+  __host__ __device__ __inline__ void nextAwStep(AmantidesWooState& state)
   {
     if (state.tMax.x < state.tMax.y)
     {

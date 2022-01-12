@@ -270,19 +270,14 @@ int main(int, char**)
 {
   rol::CpuGame game(rol::make5766rule(), 16);
 
-  auto camera = rol::makeCamera(makeFp3(0.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f));
+  auto camera = rol::makeCamera(makeFp3(-2.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f));
 
   rol::CpuRenderer renderer(640, 480);
   game.initRandomPrimordialSoup(2360);
 
   renderer.render(game, camera);
 
-  auto state = rol::initAmantidesWoo(camera.origin, camera.direction, 16);
-  while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
-  {
-    std::cout << "At " << state.pos.x << ", " << state.pos.y << ", " << state.pos.z << std::endl;
-    rol::nextAwStep(state);
-  }
+  renderer.saveFrameBmp("test.bmp");
 
   return EXIT_SUCCESS;
 }

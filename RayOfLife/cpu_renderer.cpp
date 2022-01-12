@@ -60,7 +60,7 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto rayDirection = normalize(cameraTarget - rayOrigin);
 
   auto color = makeFp3(0.f, 0.f, 0.f);
-  auto reflection = 1.f;
+  fptype reflection = 1.f;
 
   auto& pixel = m_imageData[iy * width() + ix];
   pixel.x = 0;
@@ -75,17 +75,23 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
     return;
   }
 
-  auto reflection = 1.f;
-
   auto depth = maxDepth();
   while (depth--)
   {
     auto intersection = castRay(awstate, rayOrigin, rayDirection, game, camera);
     if (!intersection.hit)
     {
-
+      break;
     }
+
+    rayOrigin = intersection.point + intersection.normal * static_cast<fptype>(0.0001f);
+    rayDirection = normalize(rayDirection - 2 * dot(rayDirection, intersection.normal) * intersection.normal);
+
+    color += reflection * intersection.color;
+    reflection *= m_scene.sphereReflection;
   }
+
+  pixel = color;
 
 #if 0
   for (auto depth = 0; depth < maxDepth(); ++depth)
@@ -125,7 +131,9 @@ rol::CpuRenderer::castRay(AmantidesWooState& awstate, fptype3 rayOrigin, fptype3
       || awstate.pos.z < 0 || awstate.pos.z >= cellsPerDim)
     {
       // We have fallen out of the cell grid
-      return;
+      RayIntersection intersection;
+      intersection.hit = false;
+      return intersection;
     }
 
     if (game.isAlive(awstate.pos.x, awstate.pos.y, awstate.pos.z))
