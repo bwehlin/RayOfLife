@@ -4,11 +4,13 @@
 
 rol::CpuGame::CpuGame(TransitionRule rule, size_t nCellsPerDimension, size_t blockSz)
   : Game(rule, nCellsPerDimension, blockSz)
-  , m_grid()
+  , m_grid0()
+  , m_grid1()
   , m_nCellsPerDimension(nCellsPerDimension)
   , m_blockSz(blockSz)
 {
-  initGrid();
+  initGrid(m_grid0);
+  initGrid(m_grid1);
 }
 
 rol::CpuGame::~CpuGame()
@@ -17,26 +19,28 @@ rol::CpuGame::~CpuGame()
   auto nBlocksTotal = nBlocksPerDim * nBlocksPerDim * nBlocksPerDim;
   for (size_t i = 0ul; i < nBlocksTotal; ++i)
   {
-    delete[] m_grid.blocks[i].octets;
+    delete[] m_grid0.blocks[i].octets;
+    delete[] m_grid1.blocks[i].octets;
   }
-  delete[] m_grid.blocks;
+  delete[] m_grid0.blocks;
+  delete[] m_grid1.blocks;
 }
 
 void
-rol::CpuGame::initGrid()
+rol::CpuGame::initGrid(CellGrid3d& grid)
 {
   auto nBlocksPerDim = (m_nCellsPerDimension / m_blockSz + 1) / 2;
 
-  m_grid.blockDim = m_blockSz;
-  m_grid.blockCount = nBlocksPerDim;
+  grid.blockDim = m_blockSz;
+  grid.blockCount = nBlocksPerDim;
 
   auto nOctetsPerDim = m_blockSz / 2;
 
-  m_grid.blocks = new CellBlock[nBlocksPerDim * nBlocksPerDim * nBlocksPerDim];
+  grid.blocks = new CellBlock[nBlocksPerDim * nBlocksPerDim * nBlocksPerDim];
   auto nBlocksTotal = nBlocksPerDim * nBlocksPerDim * nBlocksPerDim;
   for (size_t i = 0ul; i < nBlocksTotal; ++i)
   {
-    m_grid.blocks[i].octets = new uint8_t[nOctetsPerDim * nOctetsPerDim * nOctetsPerDim];
+    grid.blocks[i].octets = new uint8_t[nOctetsPerDim * nOctetsPerDim * nOctetsPerDim];
   }
 }
 
@@ -55,12 +59,22 @@ rol::CpuGame::initRandomPrimordialSoup(int seed)
   {
     for (size_t j = 0ul; j < nOctetsPerBlock; ++j)
     {
-      m_grid.blocks[i].octets[j] = static_cast<std::uint8_t>(dist(gen));
+      m_grid0.blocks[i].octets[j] = static_cast<std::uint8_t>(dist(gen));
     }
   }
+
+  m_isEvenFrame = true;
 }
 
 bool rol::CpuGame::isAlive(int x, int y, int z) const
 {
-  return rol::isAlive(m_grid, x, y, z);
+  return rol::isAlive(m_isEvenFrame ? m_grid0 : m_grid1 , x, y, z);
+}
+
+void rol::CpuGame::evolve()
+{
+  auto& oldGrid = m_isEvenFrame ? m_grid0 : m_grid1;
+  auto& newGrid = m_isEvenFrame ? m_grid1 : m_grid0;
+
+  m_isEvenFrame = !m_isEvenFrame;
 }

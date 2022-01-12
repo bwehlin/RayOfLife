@@ -146,6 +146,7 @@ namespace rol
     Game& operator=(const Game&) = delete;
 
     virtual void initRandomPrimordialSoup(int seed = 2360) = 0;
+    virtual void evolve() = 0;
 
     virtual bool isAlive(int x, int y, int z) const = 0;
 

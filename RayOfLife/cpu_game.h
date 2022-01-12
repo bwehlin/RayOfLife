@@ -14,15 +14,17 @@ namespace rol
     CpuGame& operator=(const CpuGame&) = delete;
 
     void initRandomPrimordialSoup(int seed = 2360) override;
+    void evolve() override;
 
     bool isAlive(int x, int y, int z) const override;
 
   private:
-    void initGrid();
+    void initGrid(CellGrid3d& grid);
     
-    CellGrid3d m_grid;
+    CellGrid3d m_grid0, m_grid1;
 
     size_t m_nCellsPerDimension;
     size_t m_blockSz;
+    bool m_isEvenFrame = false;
   };
 }
