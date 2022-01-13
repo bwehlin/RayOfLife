@@ -76,3 +76,20 @@ TEST(AmantidesWoo, StartOutsideCube)
   EXPECT_EQ(lastState.pos.y, 12);
   EXPECT_EQ(lastState.pos.z, 15);
 }
+
+TEST(AmantidesWoo, StartOutsideWithOffsetNegDir)
+{
+  auto state = rol::initAmantidesWoo(makeFp3(-10.f, 8.f, 8.f), makeFp3(1.f, 0.5f, -0.5f), 16);
+  auto lastState = state;
+  while (state.pos.x >= 0 && state.pos.x < 16
+    && state.pos.y >= 0 && state.pos.y < 16
+    && state.pos.z >= 0 && state.pos.z < 16)
+  {
+    lastState = state;
+    rol::nextAwStep(state);
+  }
+
+  EXPECT_EQ(lastState.pos.x, 5);
+  EXPECT_EQ(lastState.pos.y, 15);
+  EXPECT_EQ(lastState.pos.z, 0);
+}

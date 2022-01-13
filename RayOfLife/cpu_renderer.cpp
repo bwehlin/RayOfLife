@@ -25,8 +25,8 @@ rol::CpuRenderer::render(const Game& game, const Camera& camera)
 {
   auto aspect = aspectRatio();
 
-  auto screenMin = makeFp2(-1.f, -1.f / aspect + .25f);
-  auto screenMax = makeFp2(1.f, 1.f / aspect + .25f);
+  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z -0.5f / aspect + .25f);
+  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect + .25f);
 
   auto wPixels = width();
   auto hPixels = height();
@@ -54,8 +54,8 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto y = yspace[iy];
   auto x = xspace[ix];
 
-  auto rayOrigin = camera.origin;
-  auto cameraTarget = makeFp3(0.f, x, y); // TODO: Viewing planes...
+  auto rayOrigin = camera.origin;// camera.origin;
+  auto cameraTarget = makeFp3(camera.origin.x + 1.f, x, y); // TODO: Viewing planes...
 
   auto rayDirection = normalize(cameraTarget - rayOrigin);
 
@@ -68,9 +68,10 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   pixel.z = 0;
 
   auto cellsPerDim = game.cellsPerDim();
-  auto awstate = rol::initAmantidesWoo(camera.origin, rayDirection, cellsPerDim);
+  auto awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
   if (awstate.pos.x != 0)
   {
+    pixel.x = 1.;
     // Ray from origin does not hit cell grid
     return;
   }

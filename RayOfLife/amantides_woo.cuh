@@ -25,6 +25,7 @@ namespace rol
     fptype maxBoundaryCoord = static_cast<fptype>(nCellsPerDim) + 1.f;
 
     state.pos = make_int3(0, 0, 0);
+    fptype tMin = 0;
 
     // Assume we are always viewing the cube from  (-inf, 0) x [0, nCellsPerDim] x [0, nCellsPerDim].
     // This way we can only hit the side of the cube that lies along the yz plane. If we don't hit
@@ -44,10 +45,10 @@ namespace rol
     {
       // x0 + tv = 0 => t = -x0/v
 
-      auto t = -origin.x / direction.x;
+      tMin = -origin.x / direction.x;
       
-      auto y = origin.y + t * direction.y;
-      auto z = origin.z + t * direction.z;
+      auto y = origin.y + tMin * direction.y;
+      auto z = origin.z + tMin * direction.z;
 
       if (y >= 0.f && y < maxBoundaryCoord
         && z >= 0.f && z < maxBoundaryCoord)
@@ -63,22 +64,45 @@ namespace rol
       }
     }
 
-    state.step.x = direction.x < 0 ? -1
-      : direction.x > 0 ? 1
-      : 0;
+    fptype targetX, targetY, targetZ;
 
-    state.step.y = direction.y < 0 ? -1
-      : direction.y > 0 ? 1
-      : 0;
+    if (direction.x < 0)
+    {
+      state.step.x = -1;
+      targetX = state.pos.x - 1;
+    }
+    else
+    {
+      state.step.x = 1;
+      targetX = state.pos.x;
+    }
 
-    state.step.z = direction.z < 0 ? -1
-      : direction.z > 0 ? 1
-      : 0;
+    if (direction.y < 0)
+    {
+      state.step.y = -1;
+      targetY = state.pos.y - 1;
+    }
+    else
+    {
+      state.step.y = 1;
+      targetY = state.pos.y;
+    }
+
+    if (direction.z < 0)
+    {
+      state.step.z = -1;
+      targetZ = state.pos.z - 1;
+    }
+    else
+    {
+      state.step.z = 1;
+      targetZ = state.pos.z;
+    }
 
     if (direction.x != 0.f)
     {
       state.tDelta.x = fptype{ 1.f } / direction.x;
-      state.tMax.x = (fptype{ 1.f } + static_cast<fptype>(state.pos.x) - origin.x) / direction.x;
+      state.tMax.x = (fptype{ 1.f } + targetX - origin.x) / direction.x;
     }
     else
     {
@@ -89,7 +113,7 @@ namespace rol
     if (direction.y != 0.f)
     {
       state.tDelta.y = fptype{ 1.f } / direction.y;
-      state.tMax.y = (fptype{ 1.f } + static_cast<fptype>(state.pos.y) - origin.y) / direction.y;
+      state.tMax.y = (fptype{ 1.f } + targetY - origin.y) / direction.y;
     }
     else
     {
@@ -100,13 +124,27 @@ namespace rol
     if (direction.z != 0.f)
     {
       state.tDelta.z = fptype{ 1.f } / direction.z;
-      state.tMax.z = (fptype{ 1.f } + static_cast<fptype>(state.pos.z) - origin.z) / direction.z;
+      state.tMax.z = (fptype{ 1.f } + targetZ - origin.z) / direction.z;
     }
     else
     {
       state.tDelta.z = cuda::std::numeric_limits<fptype>::infinity();
       state.tMax.z = cuda::std::numeric_limits<fptype>::infinity();
     }
+
+    if (state.tDelta.x < 0)
+    {
+      state.tDelta.x = -state.tDelta.x;
+    }
+    if (state.tDelta.y < 0)
+    {
+      state.tDelta.y = -state.tDelta.y;
+    }
+    if (state.tDelta.z < 0)
+    {
+      state.tDelta.z = -state.tDelta.z;
+    }
+
 
     return state;
   }
