@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <cuda_runtime.h>
+#include <stdexcept>
+#include <string>
 
 #define FLOAT_WIDTH 64
 
@@ -51,4 +53,14 @@ namespace rol
   {
     return a > b ? a : b;
   }
+
+  class CudaError : public ::std::runtime_error
+  {
+  public:
+    CudaError(cudaError_t err, const char* file, int line)
+      : ::std::runtime_error(std::string(file) + ":" + std::to_string(line) + ": " + cudaGetErrorString(err))
+    { }
+  };
 }
+
+#define CHK_ERR(op) { cudaError_t err = op; if (err != cudaSuccess) { throw CudaError(err, __FILE__, __LINE__); } }

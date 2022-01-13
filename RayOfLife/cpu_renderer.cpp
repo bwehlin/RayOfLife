@@ -21,23 +21,12 @@ rol::CpuRenderer::imageData() const
 }
 
 void
-rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera)
+rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera,
+  const std::vector<fptype>& xspace, const std::vector<fptype>& yspace)
 {
-  auto aspect = aspectRatio();
-
-  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z -0.5f / aspect /* + .25f*/);
-  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect /* + .25f*/);
-
   auto wPixels = width();
   auto hPixels = height();
-
-  constexpr int subpixels = 10;
-
-  std::vector<fptype> xspace(wPixels * subpixels);
-  std::vector<fptype> yspace(hPixels * subpixels);
-
-  linspace(xspace.data(), screenMin.x, screenMax.x, wPixels * subpixels);
-  linspace(yspace.data(), screenMin.y, screenMax.y, hPixels * subpixels);
+  auto subpixels = subpixelCount();
 
   fptype3 pixelval;
 //#pragma omp parallel for
@@ -54,7 +43,6 @@ rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera)
       m_imageData[iy * width() + ix].x = pixelval.x / static_cast<fptype>(subpixels);
       m_imageData[iy * width() + ix].y = pixelval.y / static_cast<fptype>(subpixels);
       m_imageData[iy * width() + ix].z = pixelval.z / static_cast<fptype>(subpixels);
-
     }
   }
 }

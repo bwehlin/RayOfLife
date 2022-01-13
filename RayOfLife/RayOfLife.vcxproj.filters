@@ -47,6 +47,9 @@
     <ClInclude Include="scene_data.cuh">
       <Filter>Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="gpu_renderer.cuh">
+      <Filter>Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -69,6 +72,9 @@
     </CudaCompile>
     <CudaCompile Include="intersect.cu">
       <Filter>Math</Filter>
+    </CudaCompile>
+    <CudaCompile Include="gpu_renderer.cu">
+      <Filter>Renderer</Filter>
     </CudaCompile>
   </ItemGroup>
 </Project>
