@@ -9,6 +9,8 @@ namespace rol
 {
   // We use the voxel traversal algorithm by Amantides and Woo.
   // Reference: Amanatides, John, and Andrew Woo. "A fast voxel traversal algorithm for ray tracing." Eurographics. Vol. 87. No. 3. 1987.
+  // and the tutorial at https://github.com/cgyurgyik/fast-voxel-traversal-algorithm/blob/master/overview/FastVoxelTraversalOverview.md
+  // by Gyurgyik C and Kellison A.
 
   struct AmantidesWooState
   {
