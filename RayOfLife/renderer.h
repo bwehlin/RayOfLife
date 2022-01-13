@@ -39,7 +39,7 @@ namespace rol
 
     void saveFrameBmp(const char* filename);
 
-    virtual void render(const Game& game, const Camera& camera) = 0;
+    void render(const Game& game, const Camera& camera);
 
     void setMaxDepth(int depth) { m_maxDepth = depth; }
     [[nodiscard]] int maxDepth() const { return m_maxDepth; }
@@ -50,6 +50,8 @@ namespace rol
     [[nodiscard]] fptype sphereReflection() const noexcept { return m_sphereReflection; }
     
   private:
+    virtual void produceFrame(const Game& game, const Camera& camera) = 0;
+
     // Returns a w*h array of fptype (0-1). The array should be strided on w (row major).
     // The x component represents red, y green and z blue. In other words, the array can
     // be thought of as RGB scanlines stacked one after another.

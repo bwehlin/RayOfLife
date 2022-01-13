@@ -72,7 +72,7 @@ namespace rol
   };
 
   __host__ __device__ __inline__
-  bool isAlive(const CellGrid3d& grid, int x, int y, int z)
+  uint8_t* getOctet(const CellGrid3d& grid, int x, int y, int z)
   {
     auto blockX = x / grid.blockDim;
     auto blockY = y / grid.blockDim;
@@ -80,7 +80,7 @@ namespace rol
 
     auto blockIdx = blockZ * grid.blockCount * grid.blockCount + blockY * grid.blockCount + blockX;
 
-    auto const & block = grid.blocks[blockIdx];
+    auto const& block = grid.blocks[blockIdx];
 
     auto offsetX = x - blockX * grid.blockDim;
     auto offsetY = y - blockY * grid.blockDim;
@@ -94,11 +94,21 @@ namespace rol
 
     auto octetIdx = octetZ * octetsPerBlockPerDim * octetsPerBlockPerDim + octetY * octetsPerBlockPerDim + octetX;
 
-    auto octCoordX = x % 2;
-    auto octCoordY = y % 2;
-    auto octCoordZ = z % 2;
+    return &block.octets[octetIdx];
+  }
 
-    return getOctetValue(block.octets[octetIdx], octCoordX, octCoordY, octCoordZ);
+  __host__ __device__ __inline__
+  bool isAlive(const CellGrid3d& grid, int x, int y, int z)
+  {
+    auto* octet = getOctet(grid, x, y, z);
+    return getOctetValue(*octet, x % 2, y % 2, z % 2);
+  }
+
+  __host__ __device__ __inline__
+  void setAlive(const CellGrid3d& grid, int x, int y, int z, bool alive)
+  {
+    auto* octet = getOctet(grid, x, y, z);
+    setOctetValue(*octet, x % 2, y % 2, z % 2, alive);
   }
 
   struct TransitionRule
@@ -149,10 +159,13 @@ namespace rol
     virtual void evolve() = 0;
 
     virtual bool isAlive(int x, int y, int z) const = 0;
+    virtual void setAlive(int x, int y, int z, bool alive = true) = 0;
 
+    const TransitionRule& transitionRule() const { return m_rule; }
     int cellsPerDim() const { return m_cellsPerDim; }
 
   private:
+    TransitionRule m_rule;
     int m_cellsPerDim;
   };
 

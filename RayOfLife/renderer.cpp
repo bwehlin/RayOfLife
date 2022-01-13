@@ -58,3 +58,9 @@ rol::Renderer::writeChannelsToImage()
   m_imageIsCurrent = true;
 }
 
+void
+rol::Renderer::render(const Game& game, const Camera& camera)
+{
+  m_imageIsCurrent = false;
+  produceFrame(game, camera);
+}

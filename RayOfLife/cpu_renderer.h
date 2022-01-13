@@ -17,9 +17,8 @@ namespace rol
   public:
     CpuRenderer(size_t w, size_t h);
 
-    void render(const Game& game, const Camera& camera) override;
-
   private:
+    void produceFrame(const Game& game, const Camera& camera) override;
     const fptype3* imageData() const override;
 
     void renderPixel(int ix, int iy, const std::vector<fptype>& xspace, const std::vector<fptype>& yspace, const Game& game, const Camera& camera);

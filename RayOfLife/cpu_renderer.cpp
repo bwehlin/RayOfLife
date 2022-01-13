@@ -21,12 +21,12 @@ rol::CpuRenderer::imageData() const
 }
 
 void
-rol::CpuRenderer::render(const Game& game, const Camera& camera)
+rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera)
 {
   auto aspect = aspectRatio();
 
-  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z -0.5f / aspect + .25f);
-  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect + .25f);
+  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z -0.5f / aspect /* + .25f*/);
+  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect /* + .25f*/);
 
   auto wPixels = width();
   auto hPixels = height();
@@ -55,7 +55,7 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto x = xspace[ix];
 
   auto rayOrigin = camera.origin;
-  auto cameraTarget = makeFp3(camera.origin.x + 1.f, x + 0.1f, y); // TODO: Viewing planes...
+  auto cameraTarget = makeFp3(camera.origin.x + 1.f, x, y); // TODO: Viewing planes...
 
   auto rayDirection = normalize(cameraTarget - rayOrigin);
 
@@ -71,7 +71,6 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
   if (awstate.pos.x != 0)
   {
-    pixel.x = 1.;
     // Ray from origin does not hit cell grid
     return;
   }
@@ -96,32 +95,6 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   }
 
   pixel = color;
-
-#if 0
-  for (auto depth = 0; depth < maxDepth(); ++depth)
-  {
-    auto intersection = traceRay(rayOrigin, rayDirection, scene);
-    if (intersection.obj == scene.objects.end())
-    {
-      break;
-    }
-
-    rayOrigin = intersection.point + intersection.normal * 0.0001f;
-    rayDirection = normalize(rayDirection - 2 * dot(rayDirection, intersection.normal) * intersection.normal);
-
-    color += reflection * intersection.color;
-    reflection *= getReflection(scene, *intersection.obj);
-  }
-
-  color.x = std::clamp(color.x, 0.f, 1.f) * 255.f;
-  color.y = std::clamp(color.y, 0.f, 1.f) * 255.f;
-  color.z = std::clamp(color.z, 0.f, 1.f) * 255.f;
-
-  dstImageView(ix, dstImage.height() - 1 - iy) = boost::gil::rgb8_pixel_t(
-    static_cast<unsigned char>(color.x),
-    static_cast<unsigned char>(color.y),
-    static_cast<unsigned char>(color.z));
-#endif
 }
 
 rol::RayIntersection

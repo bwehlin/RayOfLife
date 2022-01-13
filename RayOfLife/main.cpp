@@ -268,16 +268,40 @@ void render(boost::gil::rgb8_image_t& dstImage, const Scene& scene)
 
 int main(int, char**)
 {
-  rol::CpuGame game(rol::make5766rule(), 16);
+  rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 16);
 
-  auto camera = rol::makeCamera(makeFp3(-10.f, 8.f, 8.f), makeFp3(0.3f, 0.5f, 0.7f));
+  auto camera = rol::makeCamera(makeFp3(-15.f, 8.f, 8.f), makeFp3(0.3f, 0.5f, 0.7f));
 
-  rol::CpuRenderer renderer(1280, 720);
-  game.initRandomPrimordialSoup(2360);
-
+  rol::CpuRenderer renderer(1024, 1024);
+  game.initRandomPrimordialSoup(236011);
+#if 0
+  for (int x = 7; x <= 9; ++x)
+  {
+    for (int y = 7; y <= 9; ++y)
+    {
+      for (int z = 7; z <= 9; ++z)
+      {
+        game.setAlive(x, y, z, true);
+      }
+    }
+  }
+#endif
+  renderer.setMaxDepth(10000000);
   renderer.render(game, camera);
+  renderer.saveFrameBmp("frame0.bmp");
 
-  renderer.saveFrameBmp("test.bmp");
+  for (int i = 0; i < 9; ++i)
+  {
+    std::cout << "Working on game " << i + 1 << std::endl;
+
+    game.evolve();
+    renderer.render(game, camera);
+
+    auto frameTitle = "frame" + std::to_string(i + 1) + ".bmp";
+    renderer.saveFrameBmp(frameTitle.c_str());
+  }
+
+  
 
   return EXIT_SUCCESS;
 }

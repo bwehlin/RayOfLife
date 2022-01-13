@@ -17,9 +17,11 @@ namespace rol
     void evolve() override;
 
     bool isAlive(int x, int y, int z) const override;
+    void setAlive(int x, int y, int z, bool alive = true) override;
 
   private:
     void initGrid(CellGrid3d& grid);
+    int livingNeighbors(int x, int y, int z) const;
     
     CellGrid3d m_grid0, m_grid1;
 
