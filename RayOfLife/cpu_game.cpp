@@ -68,9 +68,6 @@ rol::CpuGame::initRandomPrimordialSoup(int seed)
 
 bool rol::CpuGame::isAlive(int x, int y, int z) const
 {
-  return true;
-  return x % 2 && y % 2 && z % 2;
-
   return rol::isAlive(m_isEvenFrame ? m_grid0 : m_grid1 , x, y, z);
 }
 
