@@ -31,29 +31,39 @@ rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera)
   auto wPixels = width();
   auto hPixels = height();
 
-  std::vector<fptype> xspace(wPixels);
-  std::vector<fptype> yspace(hPixels);
+  constexpr int subpixels = 10;
 
-  linspace(xspace.data(), screenMin.x, screenMax.x, wPixels);
-  linspace(yspace.data(), screenMin.y, screenMax.y, hPixels);
+  std::vector<fptype> xspace(wPixels * subpixels);
+  std::vector<fptype> yspace(hPixels * subpixels);
 
-  for (auto iy = 0ul; iy < hPixels; ++iy)
+  linspace(xspace.data(), screenMin.x, screenMax.x, wPixels * subpixels);
+  linspace(yspace.data(), screenMin.y, screenMax.y, hPixels * subpixels);
+
+  fptype3 pixelval;
+//#pragma omp parallel for
+  for (auto iy = 0; iy < hPixels; ++iy)
   {
     for (auto ix = 0ul; ix < wPixels; ++ix)
     {
-      renderPixel(ix, iy, xspace, yspace, game, camera);
+      pixelval = makeFp3(0.f, 0.f, 0.f);
+      for (auto subpixel = 0; subpixel < subpixels; ++subpixel)
+      {
+        renderPixel(ix, iy, xspace[ix * subpixels + subpixel], yspace[iy * subpixels + subpixel], game, camera);
+        pixelval += m_imageData[iy * width() + ix];
+      }
+      m_imageData[iy * width() + ix].x = pixelval.x / static_cast<fptype>(subpixels);
+      m_imageData[iy * width() + ix].y = pixelval.y / static_cast<fptype>(subpixels);
+      m_imageData[iy * width() + ix].z = pixelval.z / static_cast<fptype>(subpixels);
+
     }
   }
 }
 
 void
 rol::CpuRenderer::renderPixel(int ix, int iy, 
-  const std::vector<fptype>& xspace, const std::vector<fptype>& yspace, 
+  fptype x, fptype y, 
   const Game& game, const Camera& camera)
 {
-  auto y = yspace[iy];
-  auto x = xspace[ix];
-
   auto rayOrigin = camera.origin;
   auto cameraTarget = makeFp3(camera.origin.x + 1.f, x, y); // TODO: Viewing planes...
 

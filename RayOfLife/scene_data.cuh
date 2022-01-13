@@ -12,7 +12,7 @@ namespace rol
 
     fptype sphereDiffuseC = 1.f;
     fptype sphereSpecularC = 1.f;
-    fptype sphereReflection = 0.2f;
+    fptype sphereReflection = 1.f;
 
     // Sphere geometry
 
