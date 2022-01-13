@@ -54,7 +54,7 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto y = yspace[iy];
   auto x = xspace[ix];
 
-  auto rayOrigin = camera.origin;// camera.origin;
+  auto rayOrigin = camera.origin;
   auto cameraTarget = makeFp3(camera.origin.x + 1.f, x + 0.1f, y); // TODO: Viewing planes...
 
   auto rayDirection = normalize(cameraTarget - rayOrigin);
