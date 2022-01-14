@@ -35,7 +35,7 @@ namespace
 
       if (isAlive(game, awstate.pos.x, awstate.pos.y, awstate.pos.z, cellsPerDim))
       {
-        auto intersection = rol::traceRay(rayOrigin, rayDirection, awstate.pos, *scene, cameraOrigin);
+        intersection = rol::traceRay(rayOrigin, rayDirection, awstate.pos, *scene, cameraOrigin);
         if (intersection.hit)
         {
           return;
@@ -63,6 +63,7 @@ namespace
     if (awstate.pos.x != 0)
     {
       // Ray from origin does not hit cell grid
+      color = makeFp3(1.f, 1.f, 0.f);
       return color;
     }
 
