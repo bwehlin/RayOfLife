@@ -43,7 +43,7 @@ namespace rol
     
   private:
     virtual void produceFrame(const Game& game, const Camera& camera,
-      const std::vector<fptype>& xspace, const std::vector<fptype>& yspace) = 0;
+      const fptype2& screenMin, const fptype2& screenMax) = 0;
 
     // Returns a w*h array of fptype (0-1). The array should be strided on w (row major).
     // The x component represents red, y green and z blue. In other words, the array can
@@ -51,7 +51,7 @@ namespace rol
     [[nodiscard]] virtual const fptype3* imageData() const = 0;
 
     int m_maxDepth = 5;
-    int m_subpixelCount = 2;
+    int m_subpixelCount = 1;
 
     fptype3 m_sphereColor = { 1.f, .572f, .184f };
     fptype m_sphereDiffuseC = 1.f;

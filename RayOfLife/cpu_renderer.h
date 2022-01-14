@@ -19,7 +19,7 @@ namespace rol
 
   private:
     void produceFrame(const Game& game, const Camera& camera, 
-      const std::vector<fptype>& xspace, const std::vector<fptype>& yspace) override;
+      const fptype2& screenMin, const fptype2& screenMax) override;
     const fptype3* imageData() const override;
 
     void renderPixel(int ix, int iy, fptype x, fptype y, const Game& game, const Camera& camera);

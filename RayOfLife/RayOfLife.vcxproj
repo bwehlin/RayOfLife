@@ -106,7 +106,6 @@
       <FileType>Document</FileType>
     </ClCompile>
     <CudaCompile Include="gpu_renderer.cu" />
-    <CudaCompile Include="intersect.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="amantides_woo.cuh" />

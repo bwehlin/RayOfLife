@@ -22,11 +22,17 @@ rol::CpuRenderer::imageData() const
 
 void
 rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera,
-  const std::vector<fptype>& xspace, const std::vector<fptype>& yspace)
+  const fptype2& screenMin, const fptype2& screenMax)
 {
   auto wPixels = width();
   auto hPixels = height();
   auto subpixels = subpixelCount();
+
+  std::vector<fptype> xspace(wPixels * subpixels);
+  std::vector<fptype> yspace(hPixels * subpixels);
+
+  linspace(xspace.data(), screenMin.x, screenMax.x, wPixels * subpixels);
+  linspace(yspace.data(), screenMin.y, screenMax.y, hPixels * subpixels);
 
   fptype3 pixelval;
 //#pragma omp parallel for
@@ -113,7 +119,7 @@ rol::CpuRenderer::castRay(AmantidesWooState& awstate, fptype3 rayOrigin, fptype3
 
     if (game.isAlive(awstate.pos.x, awstate.pos.y, awstate.pos.z))
     {
-      auto intersection = traceRay(rayOrigin, rayDirection, awstate.pos, m_scene, camera);
+      auto intersection = traceRay(rayOrigin, rayDirection, awstate.pos, m_scene, camera.origin);
       if (intersection.hit)
       {
         return intersection;

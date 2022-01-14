@@ -59,11 +59,11 @@ int main(int, char**)
 {
   try
   {
-    rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 16);
+    rol::GpuGame game(rol::makeTransitionRule(4,7,5,7), 16);
 
     auto camera = rol::makeCamera(makeFp3(-15.f, 8.f, 8.f), makeFp3(0.3f, 0.5f, 0.7f));
 
-    rol::GpuRenderer renderer(320, 240);
+    rol::CpuRenderer renderer(320, 240);
     game.initRandomPrimordialSoup(236011);
     renderer.setMaxDepth(10000000);
     renderer.render(game, camera);

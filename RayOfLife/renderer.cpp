@@ -67,19 +67,8 @@ rol::Renderer::render(const Game& game, const Camera& camera)
 {
   auto aspect = aspectRatio();
 
-  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z - 0.5f / aspect /* + .25f*/);
-  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect /* + .25f*/);
+  auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z - 0.5f / aspect);
+  auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect);
 
-  auto wPixels = width();
-  auto hPixels = height();
-
-  int subpixels = subpixelCount();
-
-  std::vector<fptype> xspace(wPixels * subpixels);
-  std::vector<fptype> yspace(hPixels * subpixels);
-
-  linspace(xspace.data(), screenMin.x, screenMax.x, wPixels * subpixels);
-  linspace(yspace.data(), screenMin.y, screenMax.y, hPixels * subpixels);
-
-  produceFrame(game, camera, xspace, yspace);
+  produceFrame(game, camera, screenMin, screenMax);
 }

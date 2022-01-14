@@ -70,9 +70,6 @@
     <CudaCompile Include="game.cu">
       <Filter>Game</Filter>
     </CudaCompile>
-    <CudaCompile Include="intersect.cu">
-      <Filter>Math</Filter>
-    </CudaCompile>
     <CudaCompile Include="gpu_renderer.cu">
       <Filter>Renderer</Filter>
     </CudaCompile>

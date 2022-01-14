@@ -22,12 +22,15 @@ namespace rol
 
   private:
     void produceFrame(const Game& game, const Camera& camera,
-      const std::vector<fptype>& xspace, const std::vector<fptype>& yspace) override;
+      const fptype2& screenMin, const fptype2& screenMax) override;
     const fptype3* imageData() const override;
+    void transferGameToGpu(const Game& game);
 
     fptype3* m_imageData;
     bool* m_d_game;
+    std::unique_ptr<bool[]> m_h_game;
 
-    SceneData m_scene;
+    SceneData* m_scene;
   };
 }
+
