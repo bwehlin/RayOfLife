@@ -8,6 +8,7 @@
 *.png
 *.asv
 *.py
+*.pdf
 
 # User-specific files
 *.rsuser
