@@ -5,6 +5,8 @@
 
 namespace rol
 {
+  // TODO: direction currently does nothing :(
+
   struct Camera
   {
     fptype3 origin;

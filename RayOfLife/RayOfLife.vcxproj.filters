@@ -19,12 +19,6 @@
     <ClInclude Include="renderer.h">
       <Filter>Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="scene_object.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="scene_object_functions.cuh">
-      <Filter>Game</Filter>
-    </ClInclude>
     <ClInclude Include="game.cuh">
       <Filter>Game</Filter>
     </ClInclude>

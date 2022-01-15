@@ -82,6 +82,8 @@ SOFTWARE.
 
 */
 
+// TODO: Move to use equivalent __host__ __device__ functions.
+
 fptype3
 rol::CpuRenderer::renderPixel(itype ix, itype iy, 
   fptype x, fptype y, 
