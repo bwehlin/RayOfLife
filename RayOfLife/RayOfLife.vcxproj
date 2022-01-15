@@ -208,6 +208,7 @@
     <Import Project="packages\libpng.1.6.28.1\build\native\libpng.targets" Condition="Exists('packages\libpng.1.6.28.1\build\native\libpng.targets')" />
     <Import Project="packages\boost.1.78.0\build\boost.targets" Condition="Exists('packages\boost.1.78.0\build\boost.targets')" />
     <Import Project="packages\boost_zlib-vc142.1.78.0\build\boost_zlib-vc142.targets" Condition="Exists('packages\boost_zlib-vc142.1.78.0\build\boost_zlib-vc142.targets')" />
+    <Import Project="packages\boost_program_options-vc142.1.78.0\build\boost_program_options-vc142.targets" Condition="Exists('packages\boost_program_options-vc142.1.78.0\build\boost_program_options-vc142.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -219,5 +220,6 @@
     <Error Condition="!Exists('packages\libpng.1.6.28.1\build\native\libpng.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\libpng.1.6.28.1\build\native\libpng.targets'))" />
     <Error Condition="!Exists('packages\boost.1.78.0\build\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost.1.78.0\build\boost.targets'))" />
     <Error Condition="!Exists('packages\boost_zlib-vc142.1.78.0\build\boost_zlib-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_zlib-vc142.1.78.0\build\boost_zlib-vc142.targets'))" />
+    <Error Condition="!Exists('packages\boost_program_options-vc142.1.78.0\build\boost_program_options-vc142.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost_program_options-vc142.1.78.0\build\boost_program_options-vc142.targets'))" />
   </Target>
 </Project>
