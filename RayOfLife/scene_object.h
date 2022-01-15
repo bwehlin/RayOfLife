@@ -15,7 +15,7 @@ namespace rol
   struct Texture
   {
     std::vector<fptype3> pixels;
-    int w;
+    itype w;
   };
 
   struct PlaneData

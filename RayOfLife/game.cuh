@@ -72,7 +72,7 @@ namespace rol
   };
 
   __host__ __device__ __inline__
-  uint8_t* getOctet(const CellGrid3d& grid, int x, int y, int z)
+  uint8_t* getOctet(const CellGrid3d& grid, itype x, itype y, itype z)
   {
     auto blockX = x / grid.blockDim;
     auto blockY = y / grid.blockDim;
@@ -98,14 +98,14 @@ namespace rol
   }
 
   __host__ __device__ __inline__
-  bool isAlive(const CellGrid3d& grid, int x, int y, int z)
+  bool isAlive(const CellGrid3d& grid, itype x, itype y, itype z)
   {
     auto* octet = getOctet(grid, x, y, z);
     return getOctetValue(*octet, x % 2, y % 2, z % 2);
   }
 
   __host__ __device__ __inline__
-  void setAlive(const CellGrid3d& grid, int x, int y, int z, bool alive)
+  void setAlive(const CellGrid3d& grid, itype x, itype y, itype z, bool alive)
   {
     auto* octet = getOctet(grid, x, y, z);
     setOctetValue(*octet, x % 2, y % 2, z % 2, alive);
@@ -158,15 +158,15 @@ namespace rol
     virtual void initRandomPrimordialSoup(int seed = 2360) = 0;
     virtual void evolve() = 0;
 
-    virtual bool isAlive(int x, int y, int z) const = 0;
-    virtual void setAlive(int x, int y, int z, bool alive = true) = 0;
+    virtual bool isAlive(itype x, itype y, itype z) const = 0;
+    virtual void setAlive(itype x, itype y, itype z, bool alive = true) = 0;
 
     const TransitionRule& transitionRule() const { return m_rule; }
-    int cellsPerDim() const { return m_cellsPerDim; }
+    itype cellsPerDim() const { return m_cellsPerDim; }
 
   private:
     TransitionRule m_rule;
-    int m_cellsPerDim;
+    itype m_cellsPerDim;
   };
 
   

@@ -10,6 +10,21 @@
 #warning("FLOAT_WIDTH not set!")
 #endif
 
+#ifndef INT_WIDTH
+#define INT_WIDTH 32
+#endif
+
+#if INT_WIDTH == 16
+using itype = short;
+using itype3 = short3;
+#elif INT_WIDTH == 32
+using itype = int;
+using itype3 = int3;
+#elif INT_WIDTH == 64
+using itype = long int;
+using itype3 = longlong3;
+#endif
+
 #if FLOAT_WIDTH == 32
 
 using fptype = float;
@@ -61,7 +76,7 @@ namespace rol
   class CudaError : public ::std::runtime_error
   {
   public:
-    CudaError(cudaError_t err, const char* file, int line)
+    CudaError(cudaError_t err, const char* file, itype line)
       : ::std::runtime_error(std::string(file) + ":" + std::to_string(line) + ": " + cudaGetErrorString(err))
     { }
   };

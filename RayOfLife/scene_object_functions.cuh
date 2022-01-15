@@ -34,9 +34,9 @@ namespace rol
   __host__ __device__ inline
     fptype3 getColor(const rol::PlaneData& plane, fptype3 pos)
   {
-    // if (int(M[0] * 2) % 2) == (int(M[2] * 2) % 2) else color_plane1),
+    // if (itype(M[0] * 2) % 2) == (itype(M[2] * 2) % 2) else color_plane1),
 
-    return (static_cast<int>(pos.x * 2.) % 2 == static_cast<int>(pos.z * 2.) % 2) ? makeFp3(1.f, 1.f, 1.f) : makeFp3(0.f, 0.f, 0.f);
+    return (static_cast<itype>(pos.x * 2.) % 2 == static_cast<itype>(pos.z * 2.) % 2) ? makeFp3(1.f, 1.f, 1.f) : makeFp3(0.f, 0.f, 0.f);
 
     //return makeFp3(1.f, 1.f, 1.f);
 
@@ -60,8 +60,8 @@ namespace rol
     auto w = plane.texture->w;
     auto h = plane.texture->pixels.size() / w;
 
-    unsigned long ix = static_cast<int>(x * static_cast<fptype>(w) * 1000.f) % w;
-    unsigned long iy = static_cast<int>(y * static_cast<fptype>(h) * 1000.f) % h;
+    unsigned long ix = static_cast<itype>(x * static_cast<fptype>(w) * 1000.f) % w;
+    unsigned long iy = static_cast<itype>(y * static_cast<fptype>(h) * 1000.f) % h;
 
     if (ix < 0)
     {

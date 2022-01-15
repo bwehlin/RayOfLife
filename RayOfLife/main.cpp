@@ -69,7 +69,7 @@ int main(int, char**)
     printDensity(game);
     renderer.saveFrameBmp("frame0.bmp");
 
-    for (int i = 0; i < 5; ++i)
+    for (itype i = 0; i < 5; ++i)
     {
       game.evolve();
       printDensity(game);

@@ -72,12 +72,12 @@ rol::CpuGame::initRandomPrimordialSoup(int seed)
   m_isEvenFrame = true;
 }
 
-bool rol::CpuGame::isAlive(int x, int y, int z) const
+bool rol::CpuGame::isAlive(itype x, itype y, itype z) const
 {
   return rol::isAlive(m_isEvenFrame ? m_grid0 : m_grid1 , x, y, z);
 }
 
-void rol::CpuGame::setAlive(int x, int y, int z, bool alive)
+void rol::CpuGame::setAlive(itype x, itype y, itype z, bool alive)
 {
   rol::setAlive(m_isEvenFrame ? m_grid0 : m_grid1, x, y, z, alive);
 }
@@ -97,7 +97,7 @@ void rol::CpuGame::evolve()
       {
         if (x == 4 && y == 8 && z == 8)
         {
-          int asdf = 0;
+          itype asdf = 0;
 
         }
 
@@ -123,8 +123,8 @@ void rol::CpuGame::evolve()
   m_isEvenFrame = !m_isEvenFrame;
 }
 
-int
-rol::CpuGame::livingNeighbors(int x, int y, int z) const
+itype
+rol::CpuGame::livingNeighbors(itype x, itype y, itype z) const
 {
   auto nCellsPerDim = cellsPerDim();
 
@@ -137,7 +137,7 @@ rol::CpuGame::livingNeighbors(int x, int y, int z) const
   auto minZ = z == 0 ? 0 : z - 1;
   auto maxZ = z == nCellsPerDim - 1 ? nCellsPerDim - 1 : z + 1;
 
-  int neighbors = 0;
+  itype neighbors = 0;
   for (auto zn = minZ; zn <= maxZ; ++zn)
   {
     for (auto yn = minY; yn <= maxY; ++yn)

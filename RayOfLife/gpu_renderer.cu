@@ -12,7 +12,7 @@
 
 namespace
 {
-  __device__ bool isAlive(bool* game, int x, int y, int z, int cellsPerDim)
+  __device__ bool isAlive(bool* game, itype x, itype y, itype z, itype cellsPerDim)
   {
     return game[z * cellsPerDim * cellsPerDim + y * cellsPerDim + x];
   }
@@ -20,7 +20,7 @@ namespace
   __device__ void castRay(rol::RayIntersection& intersection, 
     rol::AmantidesWooState& awstate, 
     fptype3 rayOrigin, fptype3 rayDirection, 
-    bool* game, int cellsPerDim, rol::SceneData* scene, fptype3 cameraOrigin)
+    bool* game, itype cellsPerDim, rol::SceneData* scene, fptype3 cameraOrigin)
   {
     while (true)
     {
@@ -49,7 +49,7 @@ namespace
   }
   
   __device__ fptype3 subpixelColor(fptype x, fptype y, fptype3 cameraOrigin, 
-    int cellsPerDim, int depth, bool* game, rol::SceneData* scene)
+    itype cellsPerDim, itype depth, bool* game, rol::SceneData* scene)
   {
     auto rayOrigin = cameraOrigin;
     auto cameraTarget = makeFp3(cameraOrigin.x + 1.f, x, y);
@@ -90,9 +90,9 @@ namespace
     return color;
   }
 
-  __global__ void renderSubpixels(fptype3* image, int w, int h,
-    fptype2 screenMin, fptype2 screenMax, int subpixels, int maxDepth,
-    bool* game, int cellsPerDim,
+  __global__ void renderSubpixels(fptype3* image, itype w, itype h,
+    fptype2 screenMin, fptype2 screenMax, itype subpixels, itype maxDepth,
+    bool* game, itype cellsPerDim,
     fptype3 cameraOrigin, rol::SceneData* scene)
   {
     auto ix = blockIdx.x * blockDim.x + threadIdx.x;
@@ -101,8 +101,8 @@ namespace
     auto x = screenMin.x + (screenMax.x - screenMin.x) * ix / fptype(w * subpixels);
     auto y = screenMin.y + (screenMax.y - screenMin.y) * iy / fptype(h * subpixels);
     
-    int imx = ix / subpixels;
-    int imy = iy / subpixels;
+    itype imx = ix / subpixels;
+    itype imy = iy / subpixels;
 
     auto imoffset = imy * w + imx;
 
@@ -112,7 +112,7 @@ namespace
     atomicAdd(&image[imoffset].z, color.z);
   }
 
-  __global__ void normalizePixels(fptype3* image, int w, int subpixels)
+  __global__ void normalizePixels(fptype3* image, itype w, itype subpixels)
   {
     auto ix = blockIdx.x * blockDim.x + threadIdx.x;
     auto iy = blockIdx.y * blockDim.y + threadIdx.y;
@@ -166,12 +166,12 @@ void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
 {
   transferGameToGpu(game);
 
-  for (int i = 0; i < width() * height(); ++i)
+  for (itype i = 0; i < width() * height(); ++i)
   {
     m_imageData[i] = makeFp3(0, 0, 0);
   }
 
-  int blockDim = 16;
+  itype blockDim = 16;
   if (width() % blockDim != 0 || height() % blockDim != 0
     || width() * subpixelCount() % blockDim != 0 || height() * subpixelCount() % blockDim != 0)
   {

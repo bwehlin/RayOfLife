@@ -59,7 +59,7 @@ rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera,
 }
 
 fptype3
-rol::CpuRenderer::renderPixel(int ix, int iy, 
+rol::CpuRenderer::renderPixel(itype ix, itype iy, 
   fptype x, fptype y, 
   const Game& game, const Camera& camera)
 {

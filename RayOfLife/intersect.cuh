@@ -45,7 +45,7 @@ namespace rol
     return cuda::std::numeric_limits<fptype>::infinity();
   }
 
-  __host__ __device__ __inline__ RayIntersection traceRay(const fptype3& rayOrigin, const fptype3& rayDirection, const int3& gridPos, const SceneData& scene, const fptype3& cameraOrigin)
+  __host__ __device__ __inline__ RayIntersection traceRay(const fptype3& rayOrigin, const fptype3& rayDirection, const itype3& gridPos, const SceneData& scene, const fptype3& cameraOrigin)
   {
     RayIntersection intersection;
 

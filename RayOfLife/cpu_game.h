@@ -16,12 +16,12 @@ namespace rol
     void initRandomPrimordialSoup(int seed = 2360) override;
     void evolve() override;
 
-    bool isAlive(int x, int y, int z) const override;
-    void setAlive(int x, int y, int z, bool alive = true) override;
+    bool isAlive(itype x, itype y, itype z) const override;
+    void setAlive(itype x, itype y, itype z, bool alive = true) override;
 
   private:
     void initGrid(CellGrid3d& grid);
-    int livingNeighbors(int x, int y, int z) const;
+    itype livingNeighbors(itype x, itype y, itype z) const;
     
     CellGrid3d m_grid0, m_grid1;
 

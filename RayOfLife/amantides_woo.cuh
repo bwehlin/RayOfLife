@@ -16,18 +16,18 @@ namespace rol
   {
     fptype3 tDelta;
     fptype3 tMax;
-    int3 step;
-    int3 pos;
+    itype3 step;
+    itype3 pos;
   };
 
-  __host__ __device__ __inline__ void initAmantidesWooCommon(AmantidesWooState& state, fptype3 origin, fptype3 direction, int nCellsPerDim)
+  __host__ __device__ __inline__ void initAmantidesWooCommon(AmantidesWooState& state, fptype3 origin, fptype3 direction, itype nCellsPerDim)
   {
     fptype targetX, targetY, targetZ;
 
     if (direction.x < 0)
     {
       state.step.x = -1;
-      targetX = state.pos.x - 1;
+      targetX = state.pos.x - itype{ 1 };
     }
     else
     {
@@ -38,7 +38,7 @@ namespace rol
     if (direction.y < 0)
     {
       state.step.y = -1;
-      targetY = state.pos.y - 1;
+      targetY = state.pos.y - itype{ 1 };
     }
     else
     {
@@ -49,7 +49,7 @@ namespace rol
     if (direction.z < 0)
     {
       state.step.z = -1;
-      targetZ = state.pos.z - 1;
+      targetZ = state.pos.z - itype{ 1 };
     }
     else
     {
@@ -104,21 +104,21 @@ namespace rol
     }
   }
 
-  __host__ __device__ __inline__ void initAmantidesWooInside(AmantidesWooState& state, fptype3 origin, fptype3 direction, int nCellsPerDim)
+  __host__ __device__ __inline__ void initAmantidesWooInside(AmantidesWooState& state, fptype3 origin, fptype3 direction, itype nCellsPerDim)
   {
-    state.pos.x = static_cast<int>(origin.x);
+    state.pos.x = static_cast<itype>(origin.x);
     if (state.pos.x < 0 || state.pos.x >= nCellsPerDim)
     {
-      state.pos.x = cuda::std::numeric_limits<int>::max();
+      state.pos.x = cuda::std::numeric_limits<itype>::max();
     }
 
-    state.pos.y = static_cast<int>(origin.y);
-    state.pos.z = static_cast<int>(origin.z);
+    state.pos.y = static_cast<itype>(origin.y);
+    state.pos.z = static_cast<itype>(origin.z);
 
     initAmantidesWooCommon(state, origin, direction, nCellsPerDim);
   }
 
-  __host__ __device__ __inline__ AmantidesWooState initAmantidesWoo(AmantidesWooState& state, fptype3 origin, fptype3 direction, int nCellsPerDim)
+  __host__ __device__ __inline__ AmantidesWooState initAmantidesWoo(AmantidesWooState& state, fptype3 origin, fptype3 direction, itype nCellsPerDim)
   {
     fptype maxBoundaryCoord = static_cast<fptype>(nCellsPerDim) + 1.f;
 
@@ -132,9 +132,9 @@ namespace rol
       // if x is inside the cube, then we have entered the cube earlier and it means
       // we're bouncing around inside the cube already.
 
-      state.pos.x = static_cast<int>(origin.x); // Assuming unit length for the cells
-      state.pos.y = static_cast<int>(origin.y);
-      state.pos.z = static_cast<int>(origin.z);
+      state.pos.x = static_cast<itype>(origin.x); // Assuming unit length for the cells
+      state.pos.y = static_cast<itype>(origin.y);
+      state.pos.z = static_cast<itype>(origin.z);
     }
     else
     {
@@ -148,12 +148,12 @@ namespace rol
         && z >= 0.f && z < maxBoundaryCoord)
       {
         state.pos.x = 0;
-        state.pos.y = static_cast<int>(y);
-        state.pos.z = static_cast<int>(z);
+        state.pos.y = static_cast<itype>(y);
+        state.pos.z = static_cast<itype>(z);
       }
       else
       {
-        state.pos.x = cuda::std::numeric_limits<int>::max();
+        state.pos.x = cuda::std::numeric_limits<itype>::max();
         return state;
       }
     }

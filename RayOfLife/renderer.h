@@ -29,11 +29,11 @@ namespace rol
 
     void render(const Game& game, const Camera& camera);
 
-    void setMaxDepth(int depth) noexcept { m_maxDepth = depth; }
-    [[nodiscard]] int maxDepth() const noexcept { return m_maxDepth; }
+    void setMaxDepth(itype depth) noexcept { m_maxDepth = depth; }
+    [[nodiscard]] itype maxDepth() const noexcept { return m_maxDepth; }
 
-    void setSubpixelCount(int subpixels) noexcept { m_subpixelCount = subpixels; }
-    [[nodiscard]] int subpixelCount() const noexcept { return m_subpixelCount; }
+    void setSubpixelCount(itype subpixels) noexcept { m_subpixelCount = subpixels; }
+    [[nodiscard]] itype subpixelCount() const noexcept { return m_subpixelCount; }
 
 
     [[nodiscard]] fptype3 sphereColor() const noexcept { return m_sphereColor; }
@@ -50,8 +50,8 @@ namespace rol
     // be thought of as RGB scanlines stacked one after another.
     [[nodiscard]] virtual const fptype3* imageData() const = 0;
 
-    int m_maxDepth = 50;
-    int m_subpixelCount = 1;
+    itype m_maxDepth = 50;
+    itype m_subpixelCount = 1;
 
     fptype3 m_sphereColor = { 1.f, .572f, .184f };
     fptype m_sphereDiffuseC = 1.f;
