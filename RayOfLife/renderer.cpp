@@ -81,6 +81,7 @@ rol::Renderer::render(const Game& game, const Camera& camera)
   using ftime = std::chrono::duration<double>;
   ftime frameTime = end - start;
   auto frameSeconds = frameTime.count();
+  m_lastFrameSecs = frameSeconds;
 
   if (frameSeconds > 1.)
   {

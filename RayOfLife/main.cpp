@@ -23,11 +23,14 @@ SOFTWARE.
 
 #include <cstdlib>
 #include <iostream>
+#include <numeric>
 #include <boost/program_options.hpp>
 
 #include "cpu_game.h"
 #include "cpu_renderer.h"
 #include "gpu_renderer.cuh"
+
+#include <omp.h>
 
 namespace
 {
@@ -59,6 +62,8 @@ namespace
     int h = 768;
     int maxdepth = 50;
     int subpixels = 4;
+    int ompthreads = -1;
+    int measureframe = -1;
   };
 
   std::pair<CmdOpts, bool> parseArgs(int argc, char** argv)
@@ -73,11 +78,13 @@ namespace
       ("h", po::value<int>(), "height (default 768)")
       ("maxdepth", po::value<int>(), "maximum reflection depth (default: 50)")
       ("subpixels", po::value<int>(), "subpixel grid (default: 4)")
+      ("ompthreads", po::value<int>(), "set OpenMP threads for CPU implementation (default: -1, max threads)")
+      ("measureframe", po::value<int>(), "measure time for a specific frame number (default: -1, off)")
       ;
 
     po::variables_map vm;
     po::store(po::parse_command_line(argc, argv, desc), vm);
-
+    omp_set_num_threads(1);
     CmdOpts opts;
 
     if (vm.count("help"))
@@ -123,9 +130,14 @@ namespace
       opts.h = val;
     }
 
-    if (vm.count("w") && vm.count("w") != vm.count("h"))
+    if (vm.count("w") && !vm.count("h"))
     {
-      throw std::runtime_error("Please specify both w and h.");
+      opts.h = opts.w;
+    }
+
+    if (vm.count("h") && !vm.count("w"))
+    {
+      opts.w = opts.h;
     }
 
     if (vm.count("maxdepth"))
@@ -146,6 +158,18 @@ namespace
         throw std::runtime_error("Must have positive subpixels.");
       }
       opts.subpixels = val;
+    }
+
+    if (vm.count("ompthreads"))
+    {
+      auto val = vm["ompthreads"].as<int>();
+      opts.ompthreads = val;
+    }
+
+    if (vm.count("measureframe"))
+    {
+      auto val = vm["measureframe"].as<int>();
+      opts.measureframe = val;
     }
 
     return std::make_pair(opts, true);
@@ -172,6 +196,11 @@ int main(int argc, char** argv)
       }
     }();
 
+    if (opts.ompthreads > -1)
+    {
+      omp_set_num_threads(opts.ompthreads);
+    }
+
     rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 16, 16);
 
     auto camera = rol::makeCamera(makeFp3(-0.2f, 10.f, 10.f), makeFp3(0.3f, 0.5f, 0.7f));
@@ -190,7 +219,48 @@ int main(int argc, char** argv)
       game.evolve();
       printDensity(game);
 
-      renderer->render(game, camera);
+      if (opts.measureframe == -1)
+      {
+        renderer->render(game, camera);
+      }
+      else
+      {
+        if (opts.measureframe == i)
+        {
+          renderer->render(game, camera);
+        }
+      }
+
+
+      if (opts.measureframe == i)
+      {
+        int nMeasurements = 10;
+        std::vector<double> measurements(nMeasurements);
+        for (int j = 0; j < nMeasurements; ++j)
+        {
+          renderer->render(game, camera);
+          measurements[j] = renderer->lastFrameTimeSeconds();
+        }
+
+        auto total = std::accumulate(measurements.begin(), measurements.end(), 0.);
+        auto mean = total / static_cast<double>(nMeasurements);
+        
+        auto stdev = 0.;
+        for (auto j = 0; j < nMeasurements; ++j)
+        {
+          stdev += std::pow(measurements[j] - mean, 2.);
+        }
+        stdev /= (nMeasurements - 1);
+        stdev = std::sqrt(stdev);
+
+        std::cout << "Over " << nMeasurements << " runs:\n"
+          << "  mean: " << std::scientific << mean << "s\n"
+          << "  std:  " << std::scientific << stdev << "s\n";
+      }
+      else
+      {
+        renderer->render(game, camera);
+      }
 
       auto frameTitle = "frame" + std::to_string(i + 1) + ".bmp";
       renderer->saveFrameBmp(frameTitle.c_str());

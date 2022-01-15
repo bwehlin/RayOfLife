@@ -41,6 +41,8 @@ namespace rol
     [[nodiscard]] fptype sphereSpecularC() const noexcept { return m_sphereSpecularC; }
     [[nodiscard]] fptype sphereReflection() const noexcept { return m_sphereReflection; }
     
+    [[nodiscard]] double lastFrameTimeSeconds() const noexcept { return m_lastFrameSecs; }
+
   private:
     virtual void produceFrame(const Game& game, const Camera& camera,
       const fptype2& screenMin, const fptype2& screenMax) = 0;
@@ -60,6 +62,8 @@ namespace rol
 
     size_t m_width;
     size_t m_height;
+
+    double m_lastFrameSecs = 0.;
     
   };
 }
