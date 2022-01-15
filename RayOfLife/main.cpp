@@ -64,6 +64,8 @@ namespace
     int subpixels = 4;
     int ompthreads = -1;
     int measureframe = -1;
+    int blockdim = 16;
+    int frames = 5;
   };
 
   std::pair<CmdOpts, bool> parseArgs(int argc, char** argv)
@@ -78,8 +80,10 @@ namespace
       ("h", po::value<int>(), "height (default 768)")
       ("maxdepth", po::value<int>(), "maximum reflection depth (default: 50)")
       ("subpixels", po::value<int>(), "subpixel grid (default: 4)")
+      ("blockdim", po::value<int>(), "GPU block dimension (default: 16)")
       ("ompthreads", po::value<int>(), "set OpenMP threads for CPU implementation (default: -1, max threads)")
       ("measureframe", po::value<int>(), "measure time for a specific frame number (default: -1, off)")
+      ("frames", po::value<int>(), "number of frames to render (default: 5)")
       ;
 
     po::variables_map vm;
@@ -160,6 +164,16 @@ namespace
       opts.subpixels = val;
     }
 
+    if (vm.count("blockdim"))
+    {
+      auto val = vm["blockdim"].as<int>();
+      if (val <= 0)
+      {
+        throw std::runtime_error("Must have positive blockdim.");
+      }
+      opts.blockdim = val;
+    }
+
     if (vm.count("ompthreads"))
     {
       auto val = vm["ompthreads"].as<int>();
@@ -170,6 +184,16 @@ namespace
     {
       auto val = vm["measureframe"].as<int>();
       opts.measureframe = val;
+    }
+
+    if (vm.count("frames"))
+    {
+      auto val = vm["frames"].as<int>();
+      if (val <= 0)
+      {
+        throw std::runtime_error("Must have positive frames.");
+      }
+      opts.frames = val;
     }
 
     return std::make_pair(opts, true);
@@ -192,7 +216,7 @@ int main(int argc, char** argv)
       {
       case CmdOpts::RendererType::CPU: return std::make_unique<rol::CpuRenderer>(opts.w, opts.h);
       case CmdOpts::RendererType::GPU:
-      default: return std::make_unique<rol::GpuRenderer>(opts.w, opts.h);
+      default: return std::make_unique<rol::GpuRenderer>(opts.w, opts.h, opts.blockdim);
       }
     }();
 
@@ -210,11 +234,14 @@ int main(int argc, char** argv)
     renderer->setMaxDepth(opts.maxdepth);
     renderer->setSubpixelCount(opts.subpixels);
 
-    //renderer.render(game, camera);
-    //printDensity(game);
-    //renderer.saveFrameBmp("frame0.bmp");
+    if (opts.measureframe == -1)
+    {
+      printDensity(game);
+      renderer->render(game, camera);
+      renderer->saveFrameBmp("frame0.bmp");
+    }
 
-    for (itype i = 0; i < 3; ++i)
+    for (itype i = 0; i < opts.frames - 1; ++i)
     {
       game.evolve();
       printDensity(game);

@@ -128,11 +128,12 @@ namespace
 
 }
 
-rol::GpuRenderer::GpuRenderer(size_t w, size_t h)
+rol::GpuRenderer::GpuRenderer(size_t w, size_t h, size_t blockDim)
   : Renderer(w, h)
   , m_d_game(nullptr)
   , m_imageData(nullptr)
   , m_d_subpixelBuffer(nullptr)
+  , m_blockDim(blockDim)
 {
   CHK_ERR(cudaMallocManaged(&m_imageData, sizeof(fptype3) * w * h))
   CHK_ERR(cudaMallocManaged(&m_scene, sizeof(rol::SceneData)))
@@ -171,7 +172,7 @@ void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
     m_imageData[i] = makeFp3(0, 0, 0);
   }
 
-  itype blockDim = 16;
+  itype blockDim = m_blockDim;
   if (width() % blockDim != 0 || height() % blockDim != 0
     || width() * subpixelCount() % blockDim != 0 || height() * subpixelCount() % blockDim != 0)
   {

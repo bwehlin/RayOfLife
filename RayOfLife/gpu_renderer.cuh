@@ -17,7 +17,7 @@ namespace rol
   class GpuRenderer final : public Renderer
   {
   public:
-    GpuRenderer(size_t w, size_t h);
+    GpuRenderer(size_t w, size_t h, size_t blockDim = 16);
     ~GpuRenderer();
 
   private:
@@ -32,6 +32,8 @@ namespace rol
 
     fptype3* m_d_subpixelBuffer;
     itype m_lastAllocatedSubpixelBufferSz = 0;
+
+    size_t m_blockDim;
 
     SceneData* m_scene;
   };
