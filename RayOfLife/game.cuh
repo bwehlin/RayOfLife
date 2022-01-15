@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "scene_object.h"
+#include "support.cuh"
 
 #include <cstdlib>
 #include <memory>
@@ -68,6 +68,8 @@ namespace rol
     size_t blockDim;   // Side length of each CellBlock
     size_t blockCount; // Number of CellBlocks along each axis
 
+    // TODO: There is some bug with using multiple blocks currently. For now,
+    // please use only one block to store all octets.
     CellBlock* blocks;
   };
 
@@ -169,7 +171,4 @@ namespace rol
     itype m_cellsPerDim;
   };
 
-  
-
-  //__host__ __device__ 
 }
