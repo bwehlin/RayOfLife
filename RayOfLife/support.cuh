@@ -4,7 +4,11 @@
 #include <stdexcept>
 #include <string>
 
-#define FLOAT_WIDTH 64
+// FLOAT_WIDTH is defined in project build config
+
+#ifndef FLOAT_WIDTH
+#warning("FLOAT_WIDTH not set!")
+#endif
 
 #if FLOAT_WIDTH == 32
 

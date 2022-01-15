@@ -21,59 +21,58 @@ SOFTWARE.
 
 */
 
-
 #include <cstdlib>
-#include <cmath>
 #include <iostream>
-#include <fstream>
-#include <numeric>
-#include <algorithm>
-#include "cuda_runtime.h"
-#include "device_launch_parameters.h"
-
-#ifdef _MSC_VER
-#pragma warning(push)
-#pragma warning(disable: 4996)
-#endif
-
-#include <boost/gil/image.hpp>
-#include <boost/gil/image_view.hpp>
-#include <boost/gil/extension/io/bmp.hpp>
-
-#ifdef _MSC_VER
-#pragma warning(pop)
-#endif
-
-#include <boost/math/constants/constants.hpp>
-
-#include "scene_object.h"
-#include "intersect.cuh"
-#include "vector_math.cuh"
 
 #include "cpu_game.h"
 #include "cpu_renderer.h"
 #include "gpu_renderer.cuh"
-#include "amantides_woo.cuh"
+
+namespace
+{
+  void printDensity(const rol::Game& game)
+  {
+    long livingCells = 0;
+    for (auto z = 0; z < game.cellsPerDim(); ++z)
+    {
+      for (auto y = 0; y < game.cellsPerDim(); ++y)
+      {
+        for (auto x = 0; x < game.cellsPerDim(); ++x)
+        {
+          if (game.isAlive(x, y, z))
+          {
+            ++livingCells;
+          }
+        }
+      }
+    }
+
+    auto totalCells = game.cellsPerDim() * game.cellsPerDim() * game.cellsPerDim();
+    std::cout << "Game density: " << livingCells << "/" << totalCells << " = " << static_cast<double>(livingCells) / static_cast<double>(totalCells) << '\n';
+  }
+}
 
 int main(int, char**)
 {
   try
   {
-    rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 800, 800);
+    rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 16, 16);
 
-    auto camera = rol::makeCamera(makeFp3(-50.f, 400.f, 400.f), makeFp3(0.3f, 0.5f, 0.7f));
+    auto camera = rol::makeCamera(makeFp3(-0.2f, 10.f, 10.f), makeFp3(0.3f, 0.5f, 0.7f));
 
-    rol::GpuRenderer renderer(4096, 4096);
+    rol::GpuRenderer renderer(160, 160);
     game.initRandomPrimordialSoup(236011);
     renderer.setMaxDepth(50);
-    renderer.setSubpixelCount(8);
+    renderer.setSubpixelCount(4);
 
     renderer.render(game, camera);
+    printDensity(game);
     renderer.saveFrameBmp("frame0.bmp");
 
     for (int i = 0; i < 5; ++i)
     {
       game.evolve();
+      printDensity(game);
 
       renderer.render(game, camera);
 

@@ -179,18 +179,6 @@ void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
     throw std::runtime_error("Screen dimensions and subpixel expansions must be multiples of " + std::to_string(blockDim));
   }
 
-#if 0
-  auto spBufSz = subpixelCount() * subpixelCount() * width() * height();
-  if (m_lastAllocatedSubpixelBufferSz != spBufSz)
-  {
-    if (m_d_subpixelBuffer)
-    {
-      CHK_ERR(cudaFree(m_d_subpixelBuffer))
-    }
-    CHK_ERR(cudaMalloc(&m_d_subpixelBuffer, sizeof(fptype3) * spBufSz))
-  }
-#endif
-
   auto subpixelBlocks = dim3(width() * subpixelCount() / blockDim, height() * subpixelCount() / blockDim);
   auto subpixelThreadsPerBlock = dim3(blockDim, blockDim);
 
