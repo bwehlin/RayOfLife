@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cuda_runtime.h>
 #include <device_launch_parameters.h>
+#include <device_atomic_functions.h>
 
 #include "vector_math.cuh"
 #include "amantides_woo.cuh"
@@ -13,7 +14,6 @@ namespace
 {
   __device__ bool isAlive(bool* game, int x, int y, int z, int cellsPerDim)
   {
-    return true;
     return game[z * cellsPerDim * cellsPerDim + y * cellsPerDim + x];
   }
 
@@ -59,7 +59,8 @@ namespace
     auto color = makeFp3(0.f, 0.f, 0.f);
     fptype reflection = 1.f;
 
-    auto awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
+    rol::AmantidesWooState awstate;
+    rol::initAmantidesWoo(awstate, rayOrigin, rayDirection, cellsPerDim);
     if (awstate.pos.x != 0)
     {
       // Ray from origin does not hit cell grid
@@ -79,7 +80,7 @@ namespace
       rayOrigin = intersection.point + intersection.normal * static_cast<fptype>(0.0001f);
       rayDirection = normalize(rayDirection - 2 * dot(rayDirection, intersection.normal) * intersection.normal);
 
-      awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
+      rol::initAmantidesWooInside(awstate, rayOrigin, rayDirection, cellsPerDim);
       rol::nextAwStep(awstate);
 
       color += reflection * intersection.color;
@@ -89,7 +90,7 @@ namespace
     return color;
   }
 
-  __global__ void renderPixel(fptype3* image, int w, int h, 
+  __global__ void renderSubpixels(fptype3* image, int w, int h,
     fptype2 screenMin, fptype2 screenMax, int subpixels, int maxDepth,
     bool* game, int cellsPerDim,
     fptype3 cameraOrigin, rol::SceneData* scene)
@@ -97,17 +98,41 @@ namespace
     auto ix = blockIdx.x * blockDim.x + threadIdx.x;
     auto iy = blockIdx.y * blockDim.y + threadIdx.y;
     
-    auto x = screenMin.x + (screenMax.x - screenMin.x) * (ix * subpixels) / fptype(w * subpixels);
-    auto y = screenMin.y + (screenMax.y - screenMin.y) * (iy * subpixels) / fptype(h * subpixels);
+    auto x = screenMin.x + (screenMax.x - screenMin.x) * ix / fptype(w * subpixels);
+    auto y = screenMin.y + (screenMax.y - screenMin.y) * iy / fptype(h * subpixels);
+    
+    int imx = ix / subpixels;
+    int imy = iy / subpixels;
 
-    image[iy * w + ix] = subpixelColor(x, y, cameraOrigin, cellsPerDim, maxDepth, game, scene);
+    auto imoffset = imy * w + imx;
+
+    auto color = subpixelColor(x, y, cameraOrigin, cellsPerDim, maxDepth, game, scene);
+    atomicAdd(&image[imoffset].x, color.x);
+    atomicAdd(&image[imoffset].y, color.y);
+    atomicAdd(&image[imoffset].z, color.z);
   }
+
+  __global__ void normalizePixels(fptype3* image, int w, int subpixels)
+  {
+    auto ix = blockIdx.x * blockDim.x + threadIdx.x;
+    auto iy = blockIdx.y * blockDim.y + threadIdx.y;
+
+    auto offset = iy * w + ix;
+    auto factor = fptype{ 1.f } / fptype{ subpixels };
+    factor *= factor;
+
+    image[offset].x *= factor;
+    image[offset].y *= factor;
+    image[offset].z *= factor;
+  }
+
 }
 
 rol::GpuRenderer::GpuRenderer(size_t w, size_t h)
   : Renderer(w, h)
   , m_d_game(nullptr)
   , m_imageData(nullptr)
+  , m_d_subpixelBuffer(nullptr)
 {
   CHK_ERR(cudaMallocManaged(&m_imageData, sizeof(fptype3) * w * h))
   CHK_ERR(cudaMallocManaged(&m_scene, sizeof(rol::SceneData)))
@@ -133,6 +158,7 @@ rol::GpuRenderer::~GpuRenderer()
   freeMem(m_imageData);
   freeMem(m_d_game);
   freeMem(m_scene);
+  freeMem(m_d_subpixelBuffer);
 }
 
 void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
@@ -140,17 +166,37 @@ void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
 {
   transferGameToGpu(game);
 
-  int blockDim = 16;
-  if (width() % blockDim != 0 || height() % blockDim != 0)
+  for (int i = 0; i < width() * height(); ++i)
   {
-    // Don't want to deal with block misalignment in the kernel if we don't absolutely have to.
-    throw std::runtime_error("Screen dimensions must be multiples of " + std::to_string(blockDim));
+    m_imageData[i] = makeFp3(0, 0, 0);
   }
 
-  auto blocks = dim3(width() / blockDim, height() / blockDim);
-  auto threadsPerBlock = dim3(blockDim, blockDim);
+  int blockDim = 16;
+  if (width() % blockDim != 0 || height() % blockDim != 0
+    || width() * subpixelCount() % blockDim != 0 || height() * subpixelCount() % blockDim != 0)
+  {
+    // Don't want to deal with block misalignment in the kernel if we don't absolutely have to.
+    throw std::runtime_error("Screen dimensions and subpixel expansions must be multiples of " + std::to_string(blockDim));
+  }
 
-  renderPixel<<<blocks, threadsPerBlock>>>(
+#if 0
+  auto spBufSz = subpixelCount() * subpixelCount() * width() * height();
+  if (m_lastAllocatedSubpixelBufferSz != spBufSz)
+  {
+    if (m_d_subpixelBuffer)
+    {
+      CHK_ERR(cudaFree(m_d_subpixelBuffer))
+    }
+    CHK_ERR(cudaMalloc(&m_d_subpixelBuffer, sizeof(fptype3) * spBufSz))
+  }
+#endif
+
+  auto subpixelBlocks = dim3(width() * subpixelCount() / blockDim, height() * subpixelCount() / blockDim);
+  auto subpixelThreadsPerBlock = dim3(blockDim, blockDim);
+
+  std::cout << "spb " << subpixelBlocks.x << " " << subpixelBlocks.y << std::endl;
+
+  renderSubpixels<<<subpixelBlocks, subpixelThreadsPerBlock >>>(
     m_imageData, width(), height(),
     screenMin, screenMax, subpixelCount(), maxDepth(),
     m_d_game, game.cellsPerDim(),
@@ -162,7 +208,18 @@ void rol::GpuRenderer::produceFrame(const Game& game, const Camera& camera,
     throw CudaError(err, __FILE__, __LINE__);
   }
 
+  auto pixelBlocks = dim3(width() / blockDim, height() / blockDim);
+  auto pixelThreadsPerBlock = dim3(blockDim, blockDim);
+
+  normalizePixels<<<pixelBlocks, pixelThreadsPerBlock>>>(m_imageData, width(), subpixelCount());
+  err = cudaGetLastError();
+  if (err != cudaSuccess)
+  {
+    throw CudaError(err, __FILE__, __LINE__);
+  }
+
   CHK_ERR(cudaDeviceSynchronize())
+
 }
 
 void

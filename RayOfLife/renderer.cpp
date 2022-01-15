@@ -15,6 +15,9 @@
 #pragma warning(pop)
 #endif
 
+#include <chrono>
+#include <iostream>
+
 rol::Renderer::Renderer(size_t w, size_t h)
   : m_width(w), m_height(h)
 {
@@ -70,5 +73,25 @@ rol::Renderer::render(const Game& game, const Camera& camera)
   auto screenMin = makeFp2(camera.origin.y - 0.5f, camera.origin.z - 0.5f / aspect);
   auto screenMax = makeFp2(camera.origin.y + 0.5f, camera.origin.z + 0.5f / aspect);
 
+  using clock = std::chrono::steady_clock;
+  auto start = clock::now();
   produceFrame(game, camera, screenMin, screenMax);
+  auto end = clock::now();
+
+  using ftime = std::chrono::duration<double>;
+  ftime frameTime = end - start;
+  auto frameSeconds = frameTime.count();
+
+  if (frameSeconds > 1.)
+  {
+    std::cout << "Frame time: " << frameSeconds << "s" << std::endl;
+  }
+  else if (frameSeconds > 1e-3)
+  {
+    std::cout << "Frame time: " << frameSeconds * 1e3 << "ms" << std::endl;
+  }
+  else
+  {
+    std::cout << "Frame time: " << frameSeconds * 1e6 << "us" << std::endl;
+  }
 }

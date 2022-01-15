@@ -22,7 +22,7 @@ namespace rol
       const fptype2& screenMin, const fptype2& screenMax) override;
     const fptype3* imageData() const override;
 
-    void renderPixel(int ix, int iy, fptype x, fptype y, const Game& game, const Camera& camera);
+    fptype3 renderPixel(int ix, int iy, fptype x, fptype y, const Game& game, const Camera& camera);
     RayIntersection castRay(AmantidesWooState& awstate, fptype3 rayOrigin, fptype3 rayDirection, const Game& game, const Camera& camera);
 
     std::unique_ptr<fptype3[]> m_imageData;

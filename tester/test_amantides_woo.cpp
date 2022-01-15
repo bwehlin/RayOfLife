@@ -9,7 +9,8 @@
 
 TEST(AmantidesWoo, StartAtOrigin) 
 {
-  auto state = rol::initAmantidesWoo(makeFp3(0.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f), 16);
+  rol::AmantidesWooState state;
+  rol::initAmantidesWoo(state, makeFp3(0.f, 0.f, 0.f), makeFp3(0.3f, 0.5f, 0.7f), 16);
   auto lastState = state;
   while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
   {
@@ -24,7 +25,8 @@ TEST(AmantidesWoo, StartAtOrigin)
 
 TEST(AmantidesWoo, StartAtOriginWithOffset)
 {
-  auto state = rol::initAmantidesWoo(makeFp3(0.5f, 0.3f, 0.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
+  rol::AmantidesWooState state;
+  rol::initAmantidesWoo(state, makeFp3(0.5f, 0.3f, 0.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
   auto lastState = state;
   while (state.pos.x < 16 && state.pos.y < 16 && state.pos.z < 16)
   {
@@ -39,7 +41,8 @@ TEST(AmantidesWoo, StartAtOriginWithOffset)
 
 TEST(AmantidesWoo, StartInsideCube)
 {
-  auto state = rol::initAmantidesWoo(makeFp3(4.6f, 1.3f, 3.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
+  rol::AmantidesWooState state;
+  rol::initAmantidesWoo(state, makeFp3(4.6f, 1.3f, 3.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
 
   EXPECT_EQ(state.pos.x, 4);
   EXPECT_EQ(state.pos.y, 1);
@@ -59,7 +62,8 @@ TEST(AmantidesWoo, StartInsideCube)
 
 TEST(AmantidesWoo, StartOutsideCube)
 {
-  auto state = rol::initAmantidesWoo(makeFp3(-4.6f, -1.3f, -3.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
+  rol::AmantidesWooState state;
+  rol::initAmantidesWoo(state, makeFp3(-4.6f, -1.3f, -3.2f), makeFp3(0.3f, 0.5f, 0.7f), 16);
 
   EXPECT_EQ(state.pos.x, 0);
   EXPECT_EQ(state.pos.y, 6);
@@ -79,7 +83,8 @@ TEST(AmantidesWoo, StartOutsideCube)
 
 TEST(AmantidesWoo, StartOutsideWithOffsetNegDir)
 {
-  auto state = rol::initAmantidesWoo(makeFp3(-10.f, 8.f, 8.f), makeFp3(1.f, 0.5f, -0.5f), 16);
+  rol::AmantidesWooState state;
+  rol::initAmantidesWoo(state, makeFp3(-10.f, 8.f, 8.f), makeFp3(1.f, 0.5f, -0.5f), 16);
   auto lastState = state;
   while (state.pos.x >= 0 && state.pos.x < 16
     && state.pos.y >= 0 && state.pos.y < 16

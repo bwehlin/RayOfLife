@@ -70,6 +70,14 @@
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <Include>$(BOOST_PATH)</Include>
       <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
+      <MaxRegCount>
+      </MaxRegCount>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <InterleaveSourceInPTX>true</InterleaveSourceInPTX>
+      <GenerateLineInfo>true</GenerateLineInfo>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -95,6 +103,14 @@
       <TargetMachinePlatform>64</TargetMachinePlatform>
       <Include>$(BOOST_PATH)</Include>
       <CodeGeneration>compute_61,sm_61</CodeGeneration>
+      <AdditionalCompilerOptions>
+      </AdditionalCompilerOptions>
+      <GenerateRelocatableDeviceCode>false</GenerateRelocatableDeviceCode>
+      <MaxRegCount>
+      </MaxRegCount>
+      <PtxAsOptionV>true</PtxAsOptionV>
+      <InterleaveSourceInPTX>true</InterleaveSourceInPTX>
+      <GenerateLineInfo>true</GenerateLineInfo>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

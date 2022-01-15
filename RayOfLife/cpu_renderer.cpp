@@ -34,26 +34,31 @@ rol::CpuRenderer::produceFrame(const Game& game, const Camera& camera,
   linspace(xspace.data(), screenMin.x, screenMax.x, wPixels * subpixels);
   linspace(yspace.data(), screenMin.y, screenMax.y, hPixels * subpixels);
 
-  fptype3 pixelval;
-//#pragma omp parallel for
+
+#pragma omp parallel for
   for (auto iy = 0; iy < hPixels; ++iy)
   {
-    for (auto ix = 0ul; ix < wPixels; ++ix)
+    for (auto ix = 0; ix < wPixels; ++ix)
     {
-      pixelval = makeFp3(0.f, 0.f, 0.f);
+      fptype3 pixelval = makeFp3(0.f, 0.f, 0.f);
+
       for (auto subpixel = 0; subpixel < subpixels; ++subpixel)
       {
-        renderPixel(ix, iy, xspace[ix * subpixels + subpixel], yspace[iy * subpixels + subpixel], game, camera);
-        pixelval += m_imageData[iy * width() + ix];
+        for (auto subpixel2 = 0; subpixel2 < subpixels; ++subpixel2)
+        {
+          pixelval += renderPixel(ix, iy, xspace[ix * subpixels + subpixel], yspace[iy * subpixels + subpixel2], game, camera);
+        }
       }
-      m_imageData[iy * width() + ix].x = pixelval.x / static_cast<fptype>(subpixels);
-      m_imageData[iy * width() + ix].y = pixelval.y / static_cast<fptype>(subpixels);
-      m_imageData[iy * width() + ix].z = pixelval.z / static_cast<fptype>(subpixels);
+      pixelval.x /= static_cast<fptype>(subpixels * subpixels);
+      pixelval.y /= static_cast<fptype>(subpixels * subpixels);
+      pixelval.z /= static_cast<fptype>(subpixels * subpixels);
+
+      m_imageData[iy * wPixels + ix] = pixelval;
     }
   }
 }
 
-void
+fptype3
 rol::CpuRenderer::renderPixel(int ix, int iy, 
   fptype x, fptype y, 
   const Game& game, const Camera& camera)
@@ -66,17 +71,13 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
   auto color = makeFp3(0.f, 0.f, 0.f);
   fptype reflection = 1.f;
 
-  auto& pixel = m_imageData[iy * width() + ix];
-  pixel.x = 0;
-  pixel.y = 0;
-  pixel.z = 0;
-
   auto cellsPerDim = game.cellsPerDim();
-  auto awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
+  AmantidesWooState awstate;
+  rol::initAmantidesWoo(awstate, rayOrigin, rayDirection, cellsPerDim);
   if (awstate.pos.x != 0)
   {
     // Ray from origin does not hit cell grid
-    return;
+    return color;
   }
 
   auto depth = maxDepth();
@@ -91,14 +92,14 @@ rol::CpuRenderer::renderPixel(int ix, int iy,
     rayOrigin = intersection.point + intersection.normal * static_cast<fptype>(0.0001f);
     rayDirection = normalize(rayDirection - 2 * dot(rayDirection, intersection.normal) * intersection.normal);
 
-    awstate = rol::initAmantidesWoo(rayOrigin, rayDirection, cellsPerDim);
+    rol::initAmantidesWoo(awstate, rayOrigin, rayDirection, cellsPerDim);
     rol::nextAwStep(awstate);
 
     color += reflection * intersection.color;
     reflection *= m_scene.sphereReflection;
   }
 
-  pixel = color;
+  return color;
 }
 
 rol::RayIntersection

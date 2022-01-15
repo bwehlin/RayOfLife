@@ -50,7 +50,7 @@ namespace rol
     // be thought of as RGB scanlines stacked one after another.
     [[nodiscard]] virtual const fptype3* imageData() const = 0;
 
-    int m_maxDepth = 5;
+    int m_maxDepth = 50;
     int m_subpixelCount = 1;
 
     fptype3 m_sphereColor = { 1.f, .572f, .184f };

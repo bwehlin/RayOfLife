@@ -59,21 +59,22 @@ int main(int, char**)
 {
   try
   {
-    rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 16);
+    rol::CpuGame game(rol::makeTransitionRule(4,7,5,7), 800, 800);
 
-    auto camera = rol::makeCamera(makeFp3(-15.f, 8.f, 8.f), makeFp3(0.3f, 0.5f, 0.7f));
+    auto camera = rol::makeCamera(makeFp3(-50.f, 400.f, 400.f), makeFp3(0.3f, 0.5f, 0.7f));
 
-    rol::GpuRenderer renderer(1024, 1024);
+    rol::GpuRenderer renderer(4096, 4096);
     game.initRandomPrimordialSoup(236011);
-    renderer.setMaxDepth(10000000);
+    renderer.setMaxDepth(50);
+    renderer.setSubpixelCount(8);
+
     renderer.render(game, camera);
     renderer.saveFrameBmp("frame0.bmp");
 
-    for (int i = 0; i < 1; ++i)
+    for (int i = 0; i < 5; ++i)
     {
-      std::cout << "Working on game " << i + 1 << std::endl;
-
       game.evolve();
+
       renderer.render(game, camera);
 
       auto frameTitle = "frame" + std::to_string(i + 1) + ".bmp";

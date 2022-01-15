@@ -30,6 +30,9 @@ namespace rol
     bool* m_d_game;
     std::unique_ptr<bool[]> m_h_game;
 
+    fptype3* m_d_subpixelBuffer;
+    int m_lastAllocatedSubpixelBufferSz = 0;
+
     SceneData* m_scene;
   };
 }
